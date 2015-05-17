@@ -1,0 +1,18 @@
+Package: rnaseqcomp
+Title: Benchmark for RNA-seq Quantification Pipelines
+Version: 0.1.0
+Date: 2015-05-16
+Author: Mingxiang Teng and Rafael Irizarry
+Maintainer: Mingxiang Teng <mxteng@jimmy.harvard.edu>
+Imports:
+    RColorBrewer
+Depends:
+    R (>= 3.1.2)
+Description: Several quantitative and visualized benchmarks
+    for RNA-seq quantification pipelines. Two-replicate
+    quantifications for genes, transcripts or exons by each 
+    pipeline with nessasery meta information should be 
+    organizd into numeric matrix in order to process the 
+    evaluation.
+License: GPL-2
+biocViews: RNA-seq, Pipeline, Evaluation, Quality control
