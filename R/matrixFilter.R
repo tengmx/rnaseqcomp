@@ -9,17 +9,18 @@
 #' pipelines, estimation of confidence thresholds on all the
 #' pipelins based on given thresholds from selected pipelines.
 #'
-#' @param quantData A matrix of quantifications with rows by genes,
-#' transcriptsm, exons etc. and columns by pipelines each with 2
-#' replicates. Missing data is allowed as NA.
+#' @param quantData A matrix of quantifications with rows by 
+#' features (genes, transcriptsm, jucntions or exons) and columns
+#' by pipelines each with 2 replicates. Missing data is allowed 
+#' as NA.
 #' @param repInfo A factor documenting quantification pipeline
 #' names correponding to the columns of \code{quantData}.
 #' @param txFIdx A logical vector corresponding to the rows of
-#' \code{quantData}, providing which rows should be considered
+#' \code{quantData}, providing which features should be considered
 #' for downsteam analyis, e.g. protein coding genes.
 #' @param hkIdx A logical vector corresponding to the rows of
-#' \code{quantData}, providing which rows should be considered as
-#' calibration reference, e.g. house keeping genes.
+#' \code{quantData}, providing which features should be considered
+#' as calibration reference, e.g. house keeping genes.
 #' @param unitFIdx A logical vector corresponding to the columns
 #' of \code{quantData}, providing which columns (i.e. pipelines)
 #' should be applied for given threshold \code{unitCut}.

@@ -1,4 +1,4 @@
-#' @title CAT Plots of Differential Express Genes
+#' @title CAT Plots of Differential Express Features
 #'
 #' @description For each pipeline, 2 biological conditions
 #' (cell lines) each with 2 quantification replicates are

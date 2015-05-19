@@ -1,9 +1,9 @@
-#' @title Plots of Express And Non-express Genes
+#' @title Plots of Express And Non-express Featuress
 #'
 #' @description For each pipeline, two quantification replicates
 #' are compared and proportions of both-express, both-non-express
-#' and either-or-express genes are calculated. Then, reverse
-#' proportion accumulation for either-or-express genes are 
+#' and either-or-express features are calculated. Then, reverse
+#' proportion accumulation for either-or-express features are 
 #' plotted stratefied by detrended log signals.
 #'
 #' @param dat A \code{rnaseqcomp} S4 class object.
