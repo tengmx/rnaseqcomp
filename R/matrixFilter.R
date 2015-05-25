@@ -84,4 +84,4 @@ matrixFilter <- function(quantData, repInfo, txFIdx, hkIdx,
                repInfo = repInfo, hkmed = hkmed, scaler = scaler)
     return(dat)
 }
-################################################################################
+

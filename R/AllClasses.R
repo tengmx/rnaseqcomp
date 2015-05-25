@@ -3,7 +3,7 @@
 #' @param object A object of S4 rnaseqcomp class
 #'
 #' @return TRUE, or charater if error happens.
-#' @export
+#'
 check_rnaseqcomp <- function(object) {
     errors <- character()
     repsnot2 <- sum(summary(object@repInfo) != 2)

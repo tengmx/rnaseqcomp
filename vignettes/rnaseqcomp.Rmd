@@ -3,8 +3,8 @@ title: "rnaseqcomp: A Benchmark for RNA-seq Quantification Pipelines"
 author: |
   | Mingxiang Teng <mxteng@jimmy.harvard.edu>
   | Rafael A. Irizarry <rafa@jimmy.harvard.edu>
-  | Department of Biostatistics and Computational Biology, Dana-Farber Cancer Institute
-  | Department of Biostatistics, Harvard T.H. Chan School Public Health, Boston, MA, USA
+  | Department of Biostatistics, Dana-Farber Cancer Institute, 
+  | Harvard T.H. Chan School Public Health, Boston, MA, USA
 date: "`r Sys.Date()`"
 output:
   BiocStyle::pdf_document:

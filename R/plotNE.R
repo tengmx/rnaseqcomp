@@ -86,7 +86,7 @@ plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
             plot(k, pnelist[[i]], type = type[i], lwd = lwd[i], col = col[i],
                  ylim = ylim, xlim = xlim, xlab = xlab, ylab = ylab, ...)
         }else {
-            points(k, pnelist[[i]], type = type[i], lwd = lwd[i], col = col[i])
+            points(k, pnelist[[i]], type = type[i], lwd = lwd[i],col = col[i])
         }
     }
     legend('topright', names(pnelist), lwd = lwd, col = col, cex = 0.5)
