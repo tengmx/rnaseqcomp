@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotCAT.R
 \name{plotCAT}
 \alias{plotCAT}
-\title{CAT Plots of Differential Express Genes}
+\title{CAT Plots of Differential Express Features}
 \usage{
 plotCAT(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
   type = "l", lwd = 2, col = NULL, xlim = c(20, 2000), ylim = c(0, 1),
@@ -58,17 +58,20 @@ mean of replicates and microarray (accuracy).
 }
 \examples{
 data(encodeCells)
-txFIdx <- genemeta$type == "protein_coding"
-hkIdx <- genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",repInfo)
-dat1 <- matrixFilter(gm12878,repInfo,txFIdx,hkIdx,unitFIdx)
-dat2 <- matrixFilter(k562,repInfo,txFIdx,hkIdx,unitFIdx)
+txFIdx <- encodeCells$genemeta$type == "protein_coding"
+hkIdx <- encodeCells$genemeta$housekeeping
+unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
+txFIdx,hkIdx,unitFIdx)
+dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,
+txFIdx,hkIdx,unitFIdx)
 
 plotCAT(dat1,dat2)
 plotCAT(dat1,dat2,constant=1)
 
-genes <- genemeta[genemeta$type == "protein_coding", 1]
-microarray <- arrayFC[match(genes,names(arrayFC))]
+genes <- encodeCells$genemeta[encodeCells$genemeta$type ==
+"protein_coding", 1]
+microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
 plotCAT(dat1,dat2,microarray=microarray)
 plotCAT(dat1,dat2,constant=1,microarray=microarray)
 }

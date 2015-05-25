@@ -1,5 +1,5 @@
 Package: rnaseqcomp
-Version: 0.1.6
+Version: 0.2.1
 Title: Benchmark for RNA-seq Quantification Pipelines
 Description: Several quantitative and visualized benchmarks
     for RNA-seq quantification pipelines. Two-replicate
@@ -7,13 +7,12 @@ Description: Several quantitative and visualized benchmarks
     exons by each pipeline with nessasery meta information 
     should be organizd into numeric matrix in order to 
     proceed the evaluation.
-Authors@R: as.person(c(
-    "Mingxiang Teng <mxteng@jimmy.harvard.edu> [aut, cre]", 
-    "Rafael A. Irizarry [aut]"))
+Author: Mingxiang Teng and Rafael A. Irizarry
+Maintainer: Mingxiang Teng <mxteng@jimmy.harvard.edu>
 Depends: 
     R (>= 3.2.0)
 Imports: 
-    RColorBrewer
+    RColorBrewer, methods
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown
 URL: https://github.com/tengmx/rnaseqcomp

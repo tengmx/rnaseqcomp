@@ -4,7 +4,7 @@
 \name{encodeCells}
 \alias{encodeCells}
 \title{Two Cell Lines from ENCODE by 9 Methods}
-\format{A series of objects including two 56668*18
+\format{A list of objects including two 56668*18
 quantification matrices (gm12878 & k562), one 56668*3
 dataframe of gene meta information (genemeta), one factor
 documenting pipelines of RNA-seq replicates (repInfo) and

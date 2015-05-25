@@ -2,11 +2,17 @@
 % Please edit documentation in R/AllClasses.R
 \name{check_rnaseqcomp}
 \alias{check_rnaseqcomp}
-\title{rnaseqcomp}
+\title{Sanity Check of S4 rnaseqcomp class}
 \usage{
 check_rnaseqcomp(object)
 }
+\arguments{
+\item{object}{A object of S4 rnaseqcomp class}
+}
+\value{
+TRUE, or charater if error happens.
+}
 \description{
-rnaseqcomp
+Sanity Check of S4 rnaseqcomp class
 }
 

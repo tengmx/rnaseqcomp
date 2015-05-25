@@ -1,7 +1,9 @@
-#' @title rnaseqcomp
+#' @title Sanity Check of S4 rnaseqcomp class
 #'
-#' @exportClass rnaseqcomp
+#' @param object A object of S4 rnaseqcomp class
 #'
+#' @return TRUE, or charater if error happens.
+#' @export
 check_rnaseqcomp <- function(object) {
     errors <- character()
     repsnot2 <- sum(summary(object@repInfo) != 2)
@@ -29,6 +31,10 @@ check_rnaseqcomp <- function(object) {
     if (length(errors) == 0) TRUE else errors
 }
 
+#' @title rnaseqcomp
+#'
+#' @exportClass rnaseqcomp
+#'
 setClass(Class = "rnaseqcomp",
          representation = representation(
              quantData = "matrix", repInfo = "factor",

@@ -9,9 +9,9 @@
 #' pipelines, estimation of confidence thresholds on all the
 #' pipelins based on given thresholds from selected pipelines.
 #'
-#' @param quantData A matrix of quantifications with rows by 
+#' @param quantData A matrix of quantifications with rows by
 #' features (genes, transcriptsm, jucntions or exons) and columns
-#' by pipelines each with 2 replicates. Missing data is allowed 
+#' by pipelines each with 2 replicates. Missing data is allowed
 #' as NA.
 #' @param repInfo A factor documenting quantification pipeline
 #' names correponding to the columns of \code{quantData}.
@@ -36,7 +36,7 @@
 #' of calibration reference.}
 #' \item{scaler}{A number providing the scales for downstream
 #' detrended signal.}
-#' 
+#'
 #' @details
 #' In the functions \code{plotMAD} and \code{plotNE}, detrended
 #' signals with value 0 will be at the same level as value 1 for
@@ -47,10 +47,11 @@
 #'
 #' @examples
 #' data(encodeCells)
-#' txFIdx <- genemeta$type == "protein_coding"
-#' hkIdx <- genemeta$housekeeping
-#' unitFIdx <- grepl("Cufflinks",repInfo)
-#' dat <- matrixFilter(gm12878,repInfo,txFIdx,hkIdx,unitFIdx)
+#' txFIdx <- encodeCells$genemeta$type == "protein_coding"
+#' hkIdx <- encodeCells$genemeta$housekeeping
+#' unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+#' dat <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
+#' txFIdx,hkIdx,unitFIdx)
 
 matrixFilter <- function(quantData, repInfo, txFIdx, hkIdx,
                                  unitFIdx, unitCut = 1){

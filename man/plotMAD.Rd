@@ -42,10 +42,11 @@ plotted stratefied by detrended log signals.
 }
 \examples{
 data(encodeCells)
-txFIdx <- genemeta$type == "protein_coding"
-hkIdx <- genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",repInfo)
-dat <- matrixFilter(gm12878,repInfo,txFIdx,hkIdx,unitFIdx)
+txFIdx <- encodeCells$genemeta$type == "protein_coding"
+hkIdx <- encodeCells$genemeta$housekeeping
+unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+dat <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
+txFIdx,hkIdx,unitFIdx)
 plotMAD(dat)
 }
 

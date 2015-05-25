@@ -7,20 +7,21 @@
 matrixFilter(quantData, repInfo, txFIdx, hkIdx, unitFIdx, unitCut = 1)
 }
 \arguments{
-\item{quantData}{A matrix of quantifications with rows by genes,
-transcriptsm, exons etc. and columns by pipelines each with 2
-replicates. Missing data is allowed as NA.}
+\item{quantData}{A matrix of quantifications with rows by
+features (genes, transcriptsm, jucntions or exons) and columns
+by pipelines each with 2 replicates. Missing data is allowed
+as NA.}
 
 \item{repInfo}{A factor documenting quantification pipeline
 names correponding to the columns of \code{quantData}.}
 
 \item{txFIdx}{A logical vector corresponding to the rows of
-\code{quantData}, providing which rows should be considered
+\code{quantData}, providing which features should be considered
 for downsteam analyis, e.g. protein coding genes.}
 
 \item{hkIdx}{A logical vector corresponding to the rows of
-\code{quantData}, providing which rows should be considered as
-calibration reference, e.g. house keeping genes.}
+\code{quantData}, providing which features should be considered
+as calibration reference, e.g. house keeping genes.}
 
 \item{unitFIdx}{A logical vector corresponding to the columns
 of \code{quantData}, providing which columns (i.e. pipelines)
@@ -57,9 +58,10 @@ giving pipelines by \code{unitFIdx}.
 }
 \examples{
 data(encodeCells)
-txFIdx <- genemeta$type == "protein_coding"
-hkIdx <- genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",repInfo)
-dat <- matrixFilter(gm12878,repInfo,txFIdx,hkIdx,unitFIdx)
+txFIdx <- encodeCells$genemeta$type == "protein_coding"
+hkIdx <- encodeCells$genemeta$housekeeping
+unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+dat <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
+txFIdx,hkIdx,unitFIdx)
 }
 
