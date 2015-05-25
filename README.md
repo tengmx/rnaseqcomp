@@ -8,8 +8,8 @@ abundances with combination of some RNA-seq read aligner. Unfortunately, it
 is currently difficult to evaluate the performance of the best method, due
 in part to the high costs of running assessment experiments as well as the
 computational requirements of running these algorithms. **rnaseqcomp** package
-a series of statistical summaries and data visualization techniques to
-evaluate the performance of transcript quantification.
+provides a series of statistical summaries and data visualization techniques
+to evaluate the performance of such quantification.
 
 ### Installation
 
