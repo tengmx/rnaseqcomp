@@ -39,7 +39,7 @@ setClass(Class = "rnaseqcomp",
 setMethod("show", "rnaseqcomp", function(object){
     cat("rnaseqcomp: Benchmark for RNA-seq quantification pipelines\n\n")
     cat("Reps:\n", as.character(object@repInfo), "\n\n")
-    cat("House-Keeping log2Median:\n", object@hkmed, "\n\n")
+    cat("Calibration subset log2Median:\n", object@hkmed, "\n\n")
     cat("Detrened signal scaler:\n", object@scaler, "\n\n")
     rown <- nrow(object@quantData)
     coln <- ncol(object@quantData)
@@ -73,4 +73,4 @@ setMethod("show", "rnaseqcomp", function(object){
     }
     print(text)
 })
-          
+

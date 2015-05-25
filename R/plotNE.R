@@ -3,11 +3,11 @@
 #' @description For each pipeline, two quantification replicates
 #' are compared and proportions of both-express, both-non-express
 #' and either-or-express features are calculated. Then, reverse
-#' proportion accumulation for either-or-express features are 
+#' proportion accumulation for either-or-express features are
 #' plotted stratefied by detrended log signals.
 #'
 #' @param dat A \code{rnaseqcomp} S4 class object.
-#' @param step Plot steps on x-axis. 
+#' @param step Plot steps on x-axis.
 #' @param type Plot types (default: 'l').
 #' @param lwd Plot line weights (default: 2).
 #' @param col Plot colors (default: NULL, colors are assigned
@@ -21,7 +21,7 @@
 #' @param ylab Plot label of y-axis
 #' (default: 'Reverse Accumulation Proportion of NE'').
 #' @param ... Other parameters for base function \code{plot}.
-#' 
+#'
 #' @import RColorBrewer
 #'
 #' @return
@@ -29,7 +29,7 @@
 #' pipelines.}
 #' \item{matrix}{A proportion matrix of express, nonexpress and
 #' either-or-express for all pipelines.}
-#' 
+#'
 #' @export
 #' @examples
 #' data(encodeCells)
@@ -88,9 +88,9 @@ plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
             points(k, pnelist[[i]], type = type[i], lwd = lwd[i], col = col[i])
         }
     }
-    legend('topright', names(pnelist), lwd = lwd, col = col)
+    legend('topright', names(pnelist), lwd = lwd, col = col, cex = 0.5)
     dat <- cbind(pEE, pNE, pNN)
     rownames(dat) <- names(pnelist)
     return(dat)
 }
-################################################################################
+

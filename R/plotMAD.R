@@ -18,13 +18,13 @@
 #' (default: 'Detrended logSignal').
 #' @param ylab Plot label of y-axis (default: 'MAD').
 #' @param ... Other parameters for base function \code{plot}.
-#' 
+#'
 #' @import RColorBrewer
 #'
 #' @return
 #' \item{MAD plot}{MAD plots for all the quantification pipelines.}
 #' \item{MAD}{A numeric vector of median absolute deviations.}
-#' 
+#'
 #' @export
 #' @examples
 #' data(encodeCells)
@@ -76,8 +76,9 @@ plotMAD <- function(dat, type='l', lwd = 2, col = NULL,
             points(x$x, x$y, type = type[i], lwd = lwd[i], col = col[i])
         }
     }
-    legend('topright', names(cdList), lwd = lwd, col = col)
+    legend('topright', names(cdList), lwd = lwd, col = col, cex=0.5)
     # MAD
+    cat("One number statistics: MAD\n")
     return(sapply(sdlist, function(x) round(median(x[ ,2]), 3)))
 }
-################################################################################
+

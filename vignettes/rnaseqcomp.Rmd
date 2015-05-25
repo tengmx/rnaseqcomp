@@ -1,58 +1,217 @@
 ---
-title: "rnaseqcomp: A Benchmark for RNA-seq Quantification Pipelines Based on a Minimal Dataset"
-author: "Mingxiang Teng & Rafael A. Irizarry"
+title: "rnaseqcomp: A Benchmark for RNA-seq Quantification Pipelines"
+author: |
+  | Mingxiang Teng <mxteng@jimmy.harvard.edu>
+  | Rafael A. Irizarry <rafa@jimmy.harvard.edu>
+  | Department of Biostatistics and Computational Biology, Dana-Farber Cancer Institute
+  | Department of Biostatistics, Harvard T.H. Chan School Public Health, Boston, MA, USA
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  BiocStyle::pdf_document:
+    toc: true
+  BiocStyle::html_document: 
+    toc: true
+bibliography: rnaseqcomp.bib
+graphics: yes
 vignette: >
-  %\VignetteIndexEntry{rnaseqcomp: A Benchmark for RNA-seq Quantification Pipelines Based on a Minimal Dataset}
+  %\VignetteIndexEntry{the rnaseqcomp user's guide}
   %\VignetteEngine{knitr::rmarkdown}
+  %\VignettePackage{rnaseqcomp}
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r para, echo = FALSE, results='hide'}
+knitr::opts_chunk$set(dev="png",fig.show="hold",
+               fig.width=4,fig.height=4.5,fig.align="center",
+               message=FALSE,collapse=TRUE)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+# Introduction
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+RNA sequencing (RNA-seq) has been utilized as the standard technology for 
+measuring the expression abundance of genes, transcripts, exons or splicing
+junctions. Numerous quantification methods were proposed to quantify such
+abundances with combination of some RNA-seq read aligner. Unfortunately, it
+is currently difficult to evaluate the performance of the best method, due
+in part to the high costs of running assessment experiments as well as the
+computational requirements of running these algorithms. We have developed
+a series of statistical summaries and data visualization techniques to
+evaluate the performance of transcript quantification, particularly
+specificity and sensitivity.
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+The `rnaseqcomp` R-package performs comparisons and provides direct plots
+on these statistical summaries. It requires the inputs as an quantification
+table (or two, depending on which statistical comparisons is performed) by
+comapred pipelines on a paire of RNA-seq samples . With nessesary meta
+information on these pipelines (*e.g.* names), a two step analysis will
+generate the desired evaluations.
 
-## More Examples
+  1. Data filtering and data preparation. In this step, options are provided
+  for any filtering and calibration operations on the raw data. A S4 class
+  `rnaseqcomp` object will be generated form next step.
+  
+  1. Statistical summary evaluation and visualization. Functions are provided
+  for specificity and sensitivity evaluations.
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+# Getting Started
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+Load the package in R
+
+```{r library}
+library(rnaseqcomp)
 ```
 
-Also a quote using `>`:
+# Preparing Data
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+As the benchmark evaluation is performed on a pair of RNA-seq replicates, a
+quantification table should contain $2n$ columns ($n$ corresponding to the
+numebr of pipeline compared), with each column representing a sample and each
+row representing a feature (*i.e.* genes, transcripts, exons, splicing
+junctions, etc.). The function `matrixFilter` takes this table as one of the
+inputs, with extra options such as meta information of pipelines, features
+for evaluation and features for calibration, and returns a S4 `rnaseqcomp`
+object that contains everything for downstream evaluation.
+
+There are several reasons why we need extra options in this step:
+
+  1. Meta information of pipelines basically is a factor to check the sanity
+  of table columns, and to provide unique names of pipelines for downstream
+  analysis.
+  
+  1. Since there might be dramatic quantification difference between different
+  features, *e.g.* between protein coding genes and lincRNA genes, evaluations
+  based on a subset of features can provide stronger robustness than using all
+  involved features. Thus, an option is offered for selecting subset of
+  features.
+  
+  1. Due to different pipelines reports different units of quantification,
+  such as FPKM (fragments per kilobases per million), RPKM (reads per
+  kilobases per million), TPM (transcripts per million) etc. Calibrations
+  across different units are necessary. Options are provided in the way that
+  on which features the calibrations are based and to what pipeline the
+  signals are mapped. 
+
+We show here an example of selecting house-keeping genes[@Eisenberg] for
+calibration and filtering protein coding genes for evaluation. In this
+vignette, we will use enbedded dataset `encodeCells` as examples to
+illustrate this package. This dataset contains two cell-line
+quantifications, GM12878 and K562, each with two technical replicates by
+ENCODE project[@Encode]. In total, quantifications from 9 pipelines are
+included. Here, 9 pipelines are made up with 6 quantification methods
+(RESM[@Li], Cufflinks[@Trapnell], FluxCapacitor[@Montgomery],
+Sailfish[@Patro], eXpress[@Roberts] and Naive) in conjunction to 2 mapping
+algorithms (STAR and TopHat2) and different tuning parameters.
+
+```{r data}
+# load the dataset in this package
+data(encodeCells)
+ls()
+```
+
+Here, `gm12878` and `k562` are both quantification tables; repInfo is the meta
+information of pipelines; `genemeta` is the meta information for features:
+gene type and if house-keeping gene; arrayFC is fold change information
+between GM12878 and K562 cell lines from microarray platform[@Ernst].
+
+In order to fit into funtion 'matrixFilter', necessary transformation to
+logical vectors are needed for extra options.
+
+```{r meta}
+txFIdx <- genemeta$type == "protein_coding" 
+hkIdx <- genemeta$housekeeping
+unitFIdx <- grepl("Cufflinks",repInfo)
+```
+
+Generic function `show` is provided for bird-eye view of S4 `rnaseqcomp`
+object.
+
+```{r filter}
+dat1 <- matrixFilter(gm12878,repInfo,txFIdx,hkIdx,unitFIdx)
+class(dat1)
+show(dat1)
+```
+
+# Visualizing Benchmarks
+
+Three type of QC metrics can be evaluated by this package. More details
+please refer to our paper[@Teng]. 
+
+## Specificity on expressed features. 
+
+This metric is evaluated by the quantification deviations between RNA-seq
+technical replicates. Basically lower deviations indicate higher specificity.
+Both one number statistics and deviation stratified by express signals are
+provided.
+
+```{r mad}
+plotMAD(dat1)
+```
+
+Detrended signals shown in the plot are actually the signals with the same
+scales as Cufflinks pipelines, as we selected `unitFIdx` as signals from
+Cufflinks. In this case, FPKM by Cufflinks.
+
+## Specificity on non-expressed features
+
+The proportions of non-expressed features is another important statistics.
+However, two types of non-expressed features should be analyzed seperately:
+
+### Features expressed in one technical replciate but not the other.
+
+The reverse accumulated propotions of such either-or expressed features are
+plotted stratefied by the detrended signals as described previously.
+Basically, a lower curve indicates higher specificity on these features.
+
+```{r nonexpplot}
+nonexpress <- plotNE(dat1)
+```
+
+### Features expressed in neither replciates, and others.
+
+Here, proportions of both expressed, both non-expressed and either-or
+expressed features are list as a table.
+```{r nonexpmat}
+nonexpress
+```
+
+## Specificity in differential analysis
+
+We calculate the fold change of features between two different cell-lines
+and compare the fold change concordance between two technical replicates.
+A stratefy that summarizes the overlapped proportions among top differential
+expressed features is used, as we described before[@Irizarry]. 
+
+```{r diffspec}
+dat2 <- matrixFilter(k562,repInfo,txFIdx,hkIdx,unitFIdx)
+plotCAT(dat1,dat2)
+```
+
+Basically higher curve indicates better specificity. `plotCAT` also
+provides a one number summary of such specificity, which is the median of
+all overlap proportions plotted. In addition, constant is allowed for a
+more robust estimation of fold change.
+```{r,eval=FALSE}
+plotCAT(dat1,dat2,constant=1)
+```
+
+## Sensitivity in differential analysis
+
+There are other platforms provide the same quantifications such as microarray.
+We thus compare differential analysis of RNA-seq and other technology to
+evaluate sensitivity of pipelines. We have documented an object `arrayFC`
+which has been estimated from microarray technology[@Ernst]. We don't
+document the steps how we calculated microarray fold change here, since it
+is beyond the scope of this vignette. 
+
+```{r diffsens}
+genes <- genemeta[genemeta$type == "protein_coding", 1]
+microarray <- arrayFC[match(genes,names(arrayFC))]
+plotCAT(dat1,dat2,microarray=microarray)
+```
+
+By comparing with microarray differential analysis, CAT plots will be plotted
+as higher curve indicates better sensitivity. 
+
+# References
+
+

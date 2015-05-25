@@ -5,7 +5,7 @@
 #' compared and fold changes of each replicate are calculated.
 #' Then, CAT plots between replicates (precision) or between
 #' mean of replicates and microarray (accuracy).
-#' 
+#'
 #' @param dat1,dat2 \code{rnaseqcomp} S4 class objects for two
 #' conditions. \code{dat1} and \code{dat2} should have the same
 #' size of slot \code{quantData} and the same \code{repInfo}.
@@ -28,7 +28,7 @@
 #' @param ylab Plot label of y-axis
 #' (default: 'Proportion in Common').
 #' @param ... Other parameters for base function \code{plot}.
-#' 
+#'
 #' @import RColorBrewer
 #'
 #' @return
@@ -36,7 +36,7 @@
 #' \item{Precision or Accuaracy}{A numeric vector of pipeline
 #' precision or accuracy, depending on whether microarray is
 #' provided.}
-#' 
+#'
 #' @export
 #' @examples
 #' data(encodeCells)
@@ -45,7 +45,7 @@
 #' unitFIdx <- grepl("Cufflinks",repInfo)
 #' dat1 <- matrixFilter(gm12878,repInfo,txFIdx,hkIdx,unitFIdx)
 #' dat2 <- matrixFilter(k562,repInfo,txFIdx,hkIdx,unitFIdx)
-#' 
+#'
 #' plotCAT(dat1,dat2)
 #' plotCAT(dat1,dat2,constant=1)
 #'
@@ -84,7 +84,7 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
     # fold change
     fcList <- lapply(seq_len(length(cdList1)), function(i)
                      log2(cdList1[[i]]) - log2(cdList2[[i]]))
-    # handling 0s if no constant 
+    # handling 0s if no constant
     if(is.null(constant)){
         fcList <- lapply(fcList, function(x) {
                          x[is.nan(x) | is.infinite(x)] <- 0
@@ -98,7 +98,7 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
                          abs(cbind(rowMeans(x), microarray)))
     }
     # missing data
-    fcList <- lapply(fcList, function(x){ 
+    fcList <- lapply(fcList, function(x){
         x[is.na(rowSums(x)), ] <- 0
         x
     })
@@ -128,7 +128,6 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
                    col = col[i])
         }
     }
-    legend('bottomright', names(proplist), lwd = lwd, col = col)
+    legend('bottomright', names(proplist), lwd = lwd, col = col, cex = 0.5)
     sapply(proplist, median)
 }
-################################################################################

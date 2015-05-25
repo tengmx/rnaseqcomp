@@ -14,9 +14,10 @@ Depends:
     R (>= 3.2.0)
 Imports: 
     RColorBrewer
-Suggests: knitr
+VignetteBuilder: knitr
+Suggests: BiocStyle, knitr, rmarkdown
 URL: https://github.com/tengmx/rnaseqcomp
 License: Artistic-2.0
 biocViews: RNA-seq, QuantificationPipeline, Benchmark,
     QualityControl
-VignetteBuilder: knitr
+
