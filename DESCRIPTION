@@ -10,12 +10,12 @@ Description: Several quantitative and visualized benchmarks
 Author: Mingxiang Teng and Rafael A. Irizarry
 Maintainer: Mingxiang Teng <mxteng@jimmy.harvard.edu>
 Depends: 
-    R (>= 3.3.0)
+    R (>= 3.2.0)
 Imports: 
     RColorBrewer, methods
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown
 URL: https://github.com/tengmx/rnaseqcomp
-License: Artistic-2.0
+License: GPL-3
 biocViews: RNASeq, Visualization, QualityControl
 
