@@ -1,5 +1,5 @@
 ---
-title: "rnaseqcomp: A Benchmark for RNA-seq Quantification Pipelines"
+title: "The rnaseqcomp user's guide"
 author: |
   | Mingxiang Teng <mxteng@jimmy.harvard.edu>
   | Rafael A. Irizarry <rafa@jimmy.harvard.edu>
@@ -9,18 +9,17 @@ date: "`r Sys.Date()`"
 output:
   BiocStyle::pdf_document:
     toc: true
-  BiocStyle::html_document: 
-    toc: true
 bibliography: rnaseqcomp.bib
 graphics: yes
 vignette: >
-  %\VignetteIndexEntry{the rnaseqcomp user's guide}
+  %\VignetteIndexEntry{The rnaseqcomp user's guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignettePackage{rnaseqcomp}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r para, echo = FALSE, results='hide'}
+BiocStyle::markdown()
 knitr::opts_chunk$set(dev="png",fig.show="hold",
                fig.width=4,fig.height=4.5,fig.align="center",
                message=FALSE,collapse=TRUE)
@@ -91,16 +90,18 @@ There are several reasons why we need extra options in this step:
   on which features the calibrations are based and to what pipeline the
   signals are mapped. 
 
-We show here an example of selecting house-keeping genes[@Eisenberg] for
+We show here an example of selecting house-keeping genes[@eisenberg] for
 calibration and filtering protein coding genes for evaluation. In this
 vignette, we will use enbedded dataset `encodeCells` as examples to
 illustrate this package. This dataset contains two cell-line
 quantifications, GM12878 and K562, each with two technical replicates by
-ENCODE project[@Encode]. In total, quantifications from 9 pipelines are
+ENCODE project 
+[(https://www.encodeproject.org)](https://www.encodeproject.org).
+In total, quantifications from 9 pipelines are
 included. Here, 9 pipelines are made up with 6 quantification methods
-(RESM[@Li], Cufflinks[@Trapnell], FluxCapacitor[@Montgomery],
-Sailfish[@Patro], eXpress[@Roberts] and Naive) in conjunction to 2 mapping
-algorithms (STAR and TopHat2) and different tuning parameters.
+(RESM[@li], Cufflinks[@trapnell], FluxCapacitor[@montgomery],
+Sailfish[@patro], eXpress[@roberts] and Naive) in conjunction to 2 mapping
+algorithms (STAR[@dobin] and TopHat2[@kim]) and different tuning parameters.
 
 ```{r data}
 # load the dataset in this package
@@ -112,7 +113,7 @@ names(encodeCells)
 Here, `gm12878` and `k562` are both quantification tables; repInfo is the meta
 information of pipelines; `genemeta` is the meta information for features:
 gene type and if house-keeping gene; arrayFC is fold change information
-between GM12878 and K562 cell lines from microarray platform[@Ernst].
+between GM12878 and K562 cell lines from microarray platform[@ernst].
 
 In order to fit into funtion 'matrixFilter', necessary transformation to
 logical vectors are needed for extra options.
@@ -136,7 +137,7 @@ show(dat1)
 # Visualizing Benchmarks
 
 Three type of QC metrics can be evaluated by this package. More details
-please refer to our paper[@Teng]. 
+please refer to our paper[@teng]. 
 
 ## Specificity on expressed features. 
 
@@ -181,7 +182,7 @@ nonexpress
 We calculate the fold change of features between two different cell-lines
 and compare the fold change concordance between two technical replicates.
 A stratefy that summarizes the overlapped proportions among top differential
-expressed features is used, as we described before[@Irizarry]. 
+expressed features is used, as we described before[@irizarry]. 
 
 ```{r diffspec}
 dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,txFIdx,
@@ -202,7 +203,7 @@ plotCAT(dat1,dat2,constant=1)
 There are other platforms provide the same quantifications such as microarray.
 We thus compare differential analysis of RNA-seq and other technology to
 evaluate sensitivity of pipelines. We have documented an object `arrayFC`
-which has been estimated from microarray technology[@Ernst]. We don't
+which has been estimated from microarray technology[@ernst]. We don't
 document the steps how we calculated microarray fold change here, since it
 is beyond the scope of this vignette. 
 

@@ -1,5 +1,5 @@
 Package: rnaseqcomp
-Version: 0.99.0
+Version: 0.99.1
 Title: Benchmark for RNA-seq Quantification Pipelines
 Description: Several quantitative and visualized benchmarks
     for RNA-seq quantification pipelines. Two-replicate
@@ -8,7 +8,7 @@ Description: Several quantitative and visualized benchmarks
     should be organizd into numeric matrix in order to 
     proceed the evaluation.
 Author: Mingxiang Teng and Rafael A. Irizarry
-Maintainer: Mingxiang Teng <mxteng@jimmy.harvard.edu>
+Maintainer: Mingxiang Teng <tengmx@gmail.com>
 Depends: 
     R (>= 3.2.0)
 Imports: 
