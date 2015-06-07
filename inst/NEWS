@@ -2,3 +2,5 @@
     - Submit package to Bioconductor to be reviewed
 * rnaseqcomp version 0.99.1
     - First revision package to Bioconductor
+* rnaseqcomp version 0.99.2
+    - Add infinity option in plotCAT

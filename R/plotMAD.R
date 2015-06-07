@@ -10,10 +10,12 @@
 #' @param lwd Plot line weights (default: 2).
 #' @param col Plot colors (default: NULL, colors are assigned
 #' by package \code{RColorBrewer}).
+#' @param lty Plot line styles (default: 1).
 #' @param xlim Plot limits of x-axis (default: NULL, limits are
 #' estimated automatically).
 #' @param ylim Plot limits of y-axis (default: NULL, limits are
 #' estimated automatically).
+#' @param cex.leg Legend size (default: 0.6).
 #' @param xlab Plot label of x-axis
 #' (default: 'Detrended logSignal').
 #' @param ylab Plot label of y-axis (default: 'MAD').
@@ -36,7 +38,7 @@
 #' plotMAD(dat)
 
 plotMAD <- function(dat, type='l', lwd = 2, col = NULL,
-                   xlim = NULL, ylim = NULL,
+                   lty = 1, xlim = NULL, ylim = NULL,cex.leg = 0.6,
                     xlab = "Detrended logSignal", ylab = "MAD",
                    ...){
     if(!is(dat, 'rnaseqcomp'))
@@ -51,7 +53,7 @@ plotMAD <- function(dat, type='l', lwd = 2, col = NULL,
         t(t(tmp) - hkmed[[i]]) + dat@scaler
     })
     names(cdList) <- names(hkmed) <- levels(dat@repInfo)
-    # M-|A|
+    # |M| ~ A
     sdlist <- lapply(cdList, function(x)
                      cbind(rowMeans(x), abs(x[,1] - x[,2])))
     if(is.null(xlim))
@@ -66,18 +68,22 @@ plotMAD <- function(dat, type='l', lwd = 2, col = NULL,
     col <- rep_len(col, length(sdlist))
     type <- rep_len(type, length(sdlist))
     lwd <- rep_len(lwd, length(sdlist))
+    lty <- rep_len(lty, length(sdlist))
     for(i in seq_len(length(sdlist))){
         # loess smooth
         x <- loess.smooth(sdlist[[i]][ ,1], sdlist[[i]][ ,2], span = 2/3,
                           degree = 1, family = "symmetric", evaluation = 1000)
         if(i == 1) {
             plot(x$x, x$y, type = type[i], lwd = lwd[i], col = col[i],
+                 lty = lty[i],
                  ylim = ylim, xlim = xlim, xlab = xlab, ylab = ylab, ...)
         }else {
-            points(x$x, x$y, type = type[i], lwd = lwd[i], col = col[i])
+            points(x$x, x$y, type = type[i], lwd = lwd[i], col = col[i],
+                   lty = lty[i])
         }
     }
-    legend('topright', names(cdList), lwd = lwd, col = col, cex=0.5)
+    legend('topright', names(cdList), lwd = lwd, col = col,
+           lty = lty, cex = cex.leg)
     # MAD
     cat("One number statistics: MAD\n")
     return(sapply(sdlist, function(x) round(median(x[ ,2]), 3)))

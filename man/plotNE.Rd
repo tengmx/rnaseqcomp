@@ -4,8 +4,8 @@
 \alias{plotNE}
 \title{Plots of Express And Non-express Featuress}
 \usage{
-plotNE(dat, step = 0.1, type = "l", lwd = 2, col = NULL, xlim = NULL,
-  ylim = NULL, xlab = "Detrended logSignal",
+plotNE(dat, step = 0.1, type = "l", lwd = 2, col = NULL, lty = 1,
+  xlim = NULL, ylim = NULL, cex.leg = 0.6, xlab = "Detrended logSignal",
   ylab = "Reverse Accumulation Proportion of NE", ...)
 }
 \arguments{
@@ -20,11 +20,15 @@ plotNE(dat, step = 0.1, type = "l", lwd = 2, col = NULL, xlim = NULL,
 \item{col}{Plot colors (default: NULL, colors are assigned
 by package \code{RColorBrewer}).}
 
+\item{lty}{Plot line styles (default: 1).}
+
 \item{xlim}{Plot limits of x-axis (default: NULL, limits are
 estimated automatically).}
 
 \item{ylim}{Plot limits of y-axis (default: NULL, limits are
 estimated automatically).}
+
+\item{cex.leg}{Legend size (default: 0.6).}
 
 \item{xlab}{Plot label of x-axis
 (default: 'Detrended logSignal').}

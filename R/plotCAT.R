@@ -12,6 +12,9 @@
 #' @param constant A numeric constant that can be added to
 #' quantifications before fold changes calculation
 #' (default: NULL).
+#' @param infinity A logical indicator that specify if fold change
+#' of infinity should be consitered. Functional only if \code{constant}
+#' is not a positive number. (default: FALSE)
 #' @param microarray A numeric vector of fold change by
 #' microarray or other 'gold standard', with each elements
 #' corresponding to rows of \code{quantData} slot in \code{dat1}
@@ -21,12 +24,12 @@
 #' @param lwd Plot line weights (default: 2).
 #' @param col Plot colors (default: NULL, colors are assigned
 #' by package \code{RColorBrewer}).
-#' @param xlim Plot limits of x-axis (default: c(20, 2000)).
+#' @param lty Plot line styles (default: 1).
+#' @param xlim Plot limits of x-axis (default: c(20, 500)).
 #' @param ylim Plot limits of y-axis (default: c(0, 1)).
-#' @param xlab Plot label of x-axis
-#' (default: 'Size of List').
-#' @param ylab Plot label of y-axis
-#' (default: 'Proportion in Common').
+#' @param xlab Plot label of x-axis (default: 'Size of List').
+#' @param ylab Plot label of y-axis (default: 'Proportion in Common').
+#' @param cex.leg Legend size (default: 0.6).
 #' @param ... Other parameters for base function \code{plot}.
 #'
 #' @import RColorBrewer
@@ -54,13 +57,14 @@
 #' genes <- encodeCells$genemeta[encodeCells$genemeta$type ==
 #' "protein_coding", 1]
 #' microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-#' plotCAT(dat1,dat2,microarray=microarray)
-#' plotCAT(dat1,dat2,constant=1,microarray=microarray)
+#' plotCAT(dat2,dat1,microarray=microarray)
+#' plotCAT(dat2,dat1,constant=1,microarray=microarray)
 
-plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
-                    type = 'l', lwd = 2, col = NULL, xlim = c(20, 2000),
-                    ylim = c(0, 1), xlab = "Size of List",
-                    ylab = "Proportion in Common",
+plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL,
+                    infinity = FALSE, step = 5L,
+                    type = 'l', lwd = 2, col = NULL, lty = 1,
+                    xlim = c(20L, 500L), ylim = c(0, 1), xlab = "Size of List",
+                    ylab = "Proportion in Common", cex.leg = 0.6,
                     ...){
     if(!is(dat1, 'rnaseqcomp') || !is(dat2, 'rnaseqcomp'))
         stop('"plotCAT" only plots class "rnaseqcomp".')
@@ -75,6 +79,8 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
         stop('"microarray" should be numeric vector or NULL')
     if(!is.numeric(step) || step < 1)
         stop('"step" should be natual number.')
+    if(!is.logical(infinity) || length(infinity) != 1)
+        stop('"infinity" should be a logical.')
     repInfo <- dat1@repInfo
     if(!is.null(constant)){
         dat1@quantData <- dat1@quantData + constant
@@ -85,34 +91,63 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
     cdList2 <- lapply(levels(repInfo), function(i)
                       dat2@quantData[ ,repInfo == i])
     # fold change
-    fcList <- lapply(seq_len(length(cdList1)), function(i)
-                     log2(cdList1[[i]]) - log2(cdList2[[i]]))
-    # handling 0s if no constant
-    if(is.null(constant)){
-        fcList <- lapply(fcList, function(x) {
-                         x[is.nan(x) | is.infinite(x)] <- 0
-                         x })
-    }
-    # mocroarray or not
     if(is.null(microarray)){
-        fcList <- lapply(fcList, abs)
+        fcList <- lapply(seq_len(length(cdList1)), function(i)
+                         log2(cdList1[[i]]) - log2(cdList2[[i]]))
     }else{
-        fcList <- lapply(fcList, function(x)
-                         abs(cbind(rowMeans(x), microarray)))
+        fcList <- lapply(seq_len(length(cdList1)), function(i)
+                         cbind(log2(rowMeans(cdList1[[i]])) -
+                               log2(rowMeans(cdList2[[i]])),microarray))
+    }
+    # handling 0s if no constant or constant is 0
+    if(is.null(constant) || constant == 0){
+        if(!infinity){
+            fcList <- lapply(fcList, function(x) {
+                x[is.nan(x) | is.infinite(x)] <- 0
+                x })
+        }else if(is.null(microarray)){
+            fcList <- lapply(seq_len(length(fcList)), function(i){
+                x <- fcList[[i]]
+                x[is.nan(x)] <- 0
+                cutinf <- max(abs(x[!is.infinite(x)]),na.rm = TRUE)
+                x[is.infinite(x) & x < 0] <-
+                    -cutinf - cdList2[[i]][is.infinite(x) & x < 0]
+                x[is.infinite(x) & x > 0] <-
+                    cutinf + cdList1[[i]][is.infinite(x) & x > 0]
+                x
+            })
+        }else{
+            fcList <- lapply(seq_len(length(fcList)), function(i){
+                x <- fcList[[i]]
+                x[is.nan(x[,1]),1] <- 0
+                cutinf <- max(abs(x[!is.infinite(x[,1]),1]), na.rm = TRUE)
+                x[is.infinite(x[,1]) & x[,1] < 0, 1] <- -cutinf -
+                    rowMeans(cdList2[[i]])[is.infinite(x[,1]) & x[,1] < 0]
+                x[is.infinite(x[,1]) & x[,1] > 0, 1] <- cutinf +
+                    rowMeans(cdList1[[i]])[is.infinite(x[,1]) & x[,1] > 0]
+                x
+            })
+        }
     }
     # missing data
     fcList <- lapply(fcList, function(x){
         x[is.na(rowSums(x)), ] <- 0
         x
     })
-    if(is.null(xlim)) xlim <- c(20, 2000)
+    fcListAbs <- lapply(fcList,abs)
+    if(is.null(xlim)) xlim <- c(20L, 500L)
     if(is.null(ylim)) ylim <- c(0, 1)
     # ranks and proportion of concordance
-    ranks <- seq(max(xlim[1], 1), min(xlim[2], nrow(dat1@quantData)), step)
-    proplist <- lapply(fcList, function(x){
-        orders <- cbind(order(x[ ,1], decreasing = TRUE),
-                        order(x[ ,2], decreasing = TRUE))
-        sapply(ranks, function(i) sum(table(orders[seq_len(i), ]) == 2) / i)
+    ranks <- seq(max(xlim[1], 1L), min(xlim[2], nrow(dat1@quantData)), step)
+    proplist <- lapply(seq_len(length(fcListAbs)), function(i){
+        x <- fcListAbs[[i]]
+        y <- fcList[[i]]
+        order1 <- order(x[ ,1], decreasing = TRUE)
+        order1[y[order1,1] < 0] <- -order1[y[order1,1] < 0]
+        order2 <- order(x[ ,2], decreasing = TRUE)
+        order2[y[order2,2] < 0] <- -order2[y[order2,2] < 0]
+        orders <- cbind(order1,order2)
+        sapply(ranks, function(j) sum(table(orders[seq_len(j), ]) == 2) / j)
     })
     names(proplist) <- levels(repInfo)
     if(is.null(xlab))  xlab <- 'Size of List'
@@ -121,16 +156,18 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
     col <- rep_len(col, length(proplist))
     type <- rep_len(type, length(proplist))
     lwd <- rep_len(lwd, length(proplist))
+    lty <- rep_len(lty, length(proplist))
     for(i in seq_len(length(proplist))){
         if(i == 1) {
             plot(ranks, proplist[[i]], type = type[i], lwd = lwd[i],
                  col = col[i], ylim = ylim, xlim = xlim, xlab = xlab,
-                 ylab = ylab, ...)
+                 ylab = ylab, lty = lty[i], ...)
         }else {
             points(ranks, proplist[[i]], type = type[i], lwd = lwd[i],
-                   col = col[i])
+                   col = col[i], lty = lty[i])
         }
     }
-    legend('bottomright', names(proplist), lwd = lwd, col = col, cex = 0.5)
+    legend('bottomright', names(proplist), lwd = lwd, col = col,
+           lty = lty, cex = cex.leg)
     sapply(proplist, median)
 }

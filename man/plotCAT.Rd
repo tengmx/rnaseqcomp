@@ -4,9 +4,10 @@
 \alias{plotCAT}
 \title{CAT Plots of Differential Express Features}
 \usage{
-plotCAT(dat1, dat2, constant = NULL, microarray = NULL, step = 5L,
-  type = "l", lwd = 2, col = NULL, xlim = c(20, 2000), ylim = c(0, 1),
-  xlab = "Size of List", ylab = "Proportion in Common", ...)
+plotCAT(dat1, dat2, constant = NULL, microarray = NULL, infinity = FALSE,
+  step = 5L, type = "l", lwd = 2, col = NULL, lty = 1, xlim = c(20L,
+  500L), ylim = c(0, 1), xlab = "Size of List",
+  ylab = "Proportion in Common", cex.leg = 0.6, ...)
 }
 \arguments{
 \item{dat1,dat2}{\code{rnaseqcomp} S4 class objects for two
@@ -22,6 +23,10 @@ microarray or other 'gold standard', with each elements
 corresponding to rows of \code{quantData} slot in \code{dat1}
 or \code{dat2}. Missing data NA allowed. (default: NULL)}
 
+\item{infinity}{A logical indicator that specify if fold change
+of infinity should be consitered. Functional only if \code{constant}
+is not a positive number. (default: FALSE)}
+
 \item{step}{Plot steps on x-axis (default: 5).}
 
 \item{type}{Plot types (default: 'l').}
@@ -31,15 +36,17 @@ or \code{dat2}. Missing data NA allowed. (default: NULL)}
 \item{col}{Plot colors (default: NULL, colors are assigned
 by package \code{RColorBrewer}).}
 
-\item{xlim}{Plot limits of x-axis (default: c(20, 2000)).}
+\item{lty}{Plot line styles (default: 1).}
+
+\item{xlim}{Plot limits of x-axis (default: c(20, 500)).}
 
 \item{ylim}{Plot limits of y-axis (default: c(0, 1)).}
 
-\item{xlab}{Plot label of x-axis
-(default: 'Size of List').}
+\item{xlab}{Plot label of x-axis (default: 'Size of List').}
 
-\item{ylab}{Plot label of y-axis
-(default: 'Proportion in Common').}
+\item{ylab}{Plot label of y-axis (default: 'Proportion in Common').}
+
+\item{cex.leg}{Legend size (default: 0.6).}
 
 \item{...}{Other parameters for base function \code{plot}.}
 }
@@ -72,7 +79,7 @@ plotCAT(dat1,dat2,constant=1)
 genes <- encodeCells$genemeta[encodeCells$genemeta$type ==
 "protein_coding", 1]
 microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-plotCAT(dat1,dat2,microarray=microarray)
-plotCAT(dat1,dat2,constant=1,microarray=microarray)
+plotCAT(dat2,dat1,microarray=microarray)
+plotCAT(dat2,dat1,constant=1,microarray=microarray)
 }
 

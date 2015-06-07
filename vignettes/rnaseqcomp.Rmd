@@ -94,8 +94,8 @@ We show here an example of selecting house-keeping genes[@eisenberg] for
 calibration and filtering protein coding genes for evaluation. In this
 vignette, we will use enbedded dataset `encodeCells` as examples to
 illustrate this package. This dataset contains two cell-line
-quantifications, GM12878 and K562, each with two technical replicates by
-ENCODE project 
+quantifications, GM12878 and K562, each with two PolyA dUTP technical 
+replicates by ENCODE project 
 [(https://www.encodeproject.org)](https://www.encodeproject.org).
 In total, quantifications from 9 pipelines are
 included. Here, 9 pipelines are made up with 6 quantification methods
@@ -210,7 +210,7 @@ is beyond the scope of this vignette.
 ```{r diffsens}
 genes <- encodeCells$genemeta[encodeCells$genemeta$type == "protein_coding", 1]
 microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-plotCAT(dat1,dat2,microarray=microarray,constant=1)
+plotCAT(dat2,dat1,microarray=microarray,constant=1)
 ```
 
 By comparing with microarray differential analysis, CAT plots will be plotted

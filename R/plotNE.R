@@ -12,10 +12,12 @@
 #' @param lwd Plot line weights (default: 2).
 #' @param col Plot colors (default: NULL, colors are assigned
 #' by package \code{RColorBrewer}).
+#' @param lty Plot line styles (default: 1).
 #' @param xlim Plot limits of x-axis (default: NULL, limits are
 #' estimated automatically).
 #' @param ylim Plot limits of y-axis (default: NULL, limits are
 #' estimated automatically).
+#' @param cex.leg Legend size (default: 0.6).
 #' @param xlab Plot label of x-axis
 #' (default: 'Detrended logSignal').
 #' @param ylab Plot label of y-axis
@@ -41,7 +43,7 @@
 #' plotNE(dat)
 
 plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
-                   xlim = NULL, ylim = NULL,
+                   lty = 1, xlim = NULL, ylim = NULL, cex.leg = 0.6,
                    xlab = "Detrended logSignal",
                    ylab = "Reverse Accumulation Proportion of NE",
                    ...){
@@ -81,15 +83,19 @@ plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
     col <- rep_len(col, length(pnelist))
     type <- rep_len(type, length(pnelist))
     lwd <- rep_len(lwd, length(pnelist))
+    lty <- rep_len(lty, length(pnelist))
     for(i in seq_len(length(pnelist))){
         if(i == 1) {
             plot(k, pnelist[[i]], type = type[i], lwd = lwd[i], col = col[i],
+                 lty = lty[i],
                  ylim = ylim, xlim = xlim, xlab = xlab, ylab = ylab, ...)
         }else {
-            points(k, pnelist[[i]], type = type[i], lwd = lwd[i],col = col[i])
+            points(k, pnelist[[i]], type = type[i], lwd = lwd[i],col = col[i],
+                   lty = lty[i])
         }
     }
-    legend('topright', names(pnelist), lwd = lwd, col = col, cex = 0.5)
+    legend('topright', names(pnelist), lwd = lwd, col = col,
+           lty = lty, cex = cex.leg)
     dat <- cbind(pEE, pNE, pNN)
     rownames(dat) <- names(pnelist)
     return(dat)
