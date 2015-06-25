@@ -57,7 +57,7 @@ evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
 calibrationFeature <- encodeCells$genemeta$housekeeping
 unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 dat <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-evaluationFeature,calibrationFeature,unitReference)
+    evaluationFeature,calibrationFeature,unitReference)
 plotNE(dat)
 }
 

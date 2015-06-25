@@ -69,15 +69,15 @@ evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
 calibrationFeature <- encodeCells$genemeta$housekeeping
 unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-evaluationFeature,calibrationFeature,unitReference)
+    evaluationFeature,calibrationFeature,unitReference)
 dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,
-evaluationFeature,calibrationFeature,unitReference)
+    evaluationFeature,calibrationFeature,unitReference)
 
 plotCAT(dat1,dat2)
 plotCAT(dat1,dat2,infinity=TRUE)
 
 genes <- encodeCells$genemeta[encodeCells$genemeta$type ==
-"protein_coding", 1]
+    "protein_coding", 1]
 otherFC <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
 plotCAT(dat2,dat1,otherFC=otherFC)
 plotCAT(dat2,dat1,constant=1,otherFC=otherFC)

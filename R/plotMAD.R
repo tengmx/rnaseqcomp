@@ -22,6 +22,7 @@
 #' @param ... Other parameters for base function \code{plot}.
 #'
 #' @import RColorBrewer
+#' @import methods
 #'
 #' @return
 #' \item{MAD plot}{MAD plots for all the quantification pipelines.}
