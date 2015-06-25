@@ -41,7 +41,7 @@ specificity and sensitivity.
 The `rnaseqcomp` R-package performs comparisons and provides direct plots
 on these statistical summaries. It requires the inputs as an quantification
 table (or two, depending on which statistical comparisons is performed) by
-comapred pipelines on a paire of RNA-seq samples . With nessesary meta
+compared pipelines on a pair of RNA-seq samples. With necessary  meta
 information on these pipelines (*e.g.* names), a two step analysis will
 generate the desired evaluations.
 
@@ -64,7 +64,7 @@ library(rnaseqcomp)
 
 As the benchmark evaluation is performed on a pair of RNA-seq replicates, a
 quantification table should contain $2n$ columns ($n$ corresponding to the
-numebr of pipeline compared), with each column representing a sample and each
+number of pipeline compared), with each column representing a sample and each
 row representing a feature (*i.e.* genes, transcripts, exons, splicing
 junctions, etc.). The function `matrixFilter` takes this table as one of the
 inputs, with extra options such as meta information of pipelines, features
@@ -115,21 +115,21 @@ information of pipelines; `genemeta` is the meta information for features:
 gene type and if house-keeping gene; arrayFC is fold change information
 between GM12878 and K562 cell lines from microarray platform[@ernst].
 
-In order to fit into funtion 'matrixFilter', necessary transformation to
+In order to fit into function 'matrixFilter', necessary transformation to
 logical vectors are needed for extra options.
 
 ```{r meta}
-txFIdx <- encodeCells$genemeta$type == "protein_coding" 
-hkIdx <- encodeCells$genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
+calibrationFeature <- encodeCells$genemeta$housekeeping
+unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 ```
 
 Generic function `show` is provided for bird-eye view of S4 `rnaseqcomp`
 object.
 
 ```{r filter}
-dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,txFIdx,
-                     hkIdx,unitFIdx)
+dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
+    evaluationFeature,calibrationFeature,unitReference) 
 class(dat1)
 show(dat1)
 ```
@@ -151,25 +151,25 @@ plotMAD(dat1)
 ```
 
 Detrended signals shown in the plot are actually the signals with the same
-scales as Cufflinks pipelines, as we selected `unitFIdx` as signals from
+scales as Cufflinks pipelines, as we selected `unitReference` as signals from
 Cufflinks. In this case, FPKM by Cufflinks.
 
 ## Specificity on non-expressed features
 
 The proportions of non-expressed features is another important statistics.
-However, two types of non-expressed features should be analyzed seperately:
+However, two types of non-expressed features should be analyzed separately:
 
-### Features expressed in one technical replciate but not the other.
+### Features expressed in one technical replicate but not the other.
 
-The reverse accumulated propotions of such either-or expressed features are
-plotted stratefied by the detrended signals as described previously.
+The reverse accumulated proportions of such either-or expressed features are
+plotted stratified by the detrended signals as described previously.
 Basically, a lower curve indicates higher specificity on these features.
 
 ```{r nonexpplot}
 nonexpress <- plotNE(dat1)
 ```
 
-### Features expressed in neither replciates, and others.
+### Features expressed in neither replicates, and others.
 
 Here, proportions of both expressed, both non-expressed and either-or
 expressed features are list as a table.
@@ -181,12 +181,12 @@ nonexpress
 
 We calculate the fold change of features between two different cell-lines
 and compare the fold change concordance between two technical replicates.
-A stratefy that summarizes the overlapped proportions among top differential
+A strategy that summarizes the overlapped proportions among top differential
 expressed features is used, as we described before[@irizarry]. 
 
 ```{r diffspec}
-dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,txFIdx,
-                     hkIdx,unitFIdx)
+dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,
+    evaluationFeature,calibrationFeature,unitReference) 
 plotCAT(dat1,dat2)
 ```
 
@@ -196,6 +196,12 @@ all overlap proportions plotted. In addition, constant is allowed for a
 more robust estimation of fold change.
 ```{r,eval=FALSE}
 plotCAT(dat1,dat2,constant=1)
+```
+
+Or, $y/0=inf$ with $y>0$ can be considered into fold changes by comparing
+$y$ only.
+```{r,eval=FALSE}
+plotCAT(dat1,dat2,infinity=TRUE)
 ```
 
 ## Sensitivity in differential analysis
@@ -208,9 +214,9 @@ document the steps how we calculated microarray fold change here, since it
 is beyond the scope of this vignette. 
 
 ```{r diffsens}
-genes <- encodeCells$genemeta[encodeCells$genemeta$type == "protein_coding", 1]
-microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-plotCAT(dat2,dat1,microarray=microarray,constant=1)
+genes <- encodeCells$genemeta[encodeCells$genemeta$type == "protein_coding",1]
+otherFC <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
+plotCAT(dat2,dat1,constant=1,otherFC=otherFC)   
 ```
 
 By comparing with microarray differential analysis, CAT plots will be plotted

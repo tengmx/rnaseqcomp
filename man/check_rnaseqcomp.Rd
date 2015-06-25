@@ -10,7 +10,7 @@ check_rnaseqcomp(object)
 \item{object}{A object of S4 rnaseqcomp class}
 }
 \value{
-TRUE, or charater if error happens.
+TRUE, or character if error happens.
 }
 \description{
 Sanity Check of S4 rnaseqcomp class

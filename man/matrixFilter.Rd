@@ -4,64 +4,67 @@
 \alias{matrixFilter}
 \title{Quantification Table Filtering}
 \usage{
-matrixFilter(quantData, repInfo, txFIdx, hkIdx, unitFIdx, unitCut = 1)
+matrixFilter(quantData, repInfo, evaluationFeature, calibrationFeature,
+  unitReference, unitCutoff = 1)
 }
 \arguments{
 \item{quantData}{A matrix of quantifications with rows by
-features (genes, transcriptsm, jucntions or exons) and columns
+features (genes, transcripts, junctions or exons) and columns
 by pipelines each with 2 replicates. Missing data is allowed
 as NA.}
 
 \item{repInfo}{A factor documenting quantification pipeline
-names correponding to the columns of \code{quantData}.}
+names corresponding to the columns of \code{quantData}.}
 
-\item{txFIdx}{A logical vector corresponding to the rows of
-\code{quantData}, providing which features should be considered
-for downsteam analyis, e.g. protein coding genes.}
+\item{evaluationFeature}{A logical vector corresponding to the
+rows of \code{quantData}, providing which features should be
+considered for downstream evaluation, e.g. protein coding genes.}
 
-\item{hkIdx}{A logical vector corresponding to the rows of
-\code{quantData}, providing which features should be considered
-as calibration reference, e.g. house keeping genes.}
+\item{calibrationFeature}{A logical vector corresponding to the
+rows of \code{quantData}, providing which features should be
+considered as calibration reference, e.g. house keeping genes.}
 
-\item{unitFIdx}{A logical vector corresponding to the columns
-of \code{quantData}, providing which columns (i.e. pipelines)
-should be applied for given threshold \code{unitCut}.}
+\item{unitReference}{A logical vector corresponding to the columns
+of \code{quantData}, providing to which columns all units should be
+unified and given threshold \code{unitCutoff} should be applied.
+If multiple columns are chosen, it is important that these columns
+have the same units (e.g. FPKM).}
 
-\item{unitCut}{A numeric threshold for signal cutoff at given
-quantification table columns by \code{unitFidx} (default: 1).
-The effects cutoff are estimated for other columns accordingly.}
+\item{unitCutoff}{A numeric threshold for signal cutoff at given
+quantification table columns by \code{unitReference} (default: 1).
+Same effects cutoff are estimated for other columns accordingly.}
 }
 \value{
 A \code{rnaseqcomp} S4 class object
-\item{quantData}{A filtered table for downsteam analysis.}
+\item{quantData}{A filtered table for downstream analysis.}
 \item{repInfo}{A factor documenting quantification pipeline
-names correponding to the columns of \code{quantData}.}
-\item{hkmed}{A numeric vector giving the log scale medians
+names corresponding to the columns of \code{quantData}.}
+\item{refMed}{A numeric vector giving the log scale medians
 of calibration reference.}
 \item{scaler}{A number providing the scales for downstream
 detrended signal.}
 }
 \description{
 This is the function to do any pre-filtering or
-pre-processing analysis for dowstreaming benchmark estimation
+pre-processing analysis for downstream benchmark estimation
 and visualization. Pre-filtering includes row selection (e.g.
 protein coding genes) of quantification table ; pre-processing
-inlcudes calculation on a set of rows as calibration reference
+includes calculation on a set of rows as calibration reference
 (e.g. house keeping genes) across different quantification
 pipelines, estimation of confidence thresholds on all the
-pipelins based on given thresholds from selected pipelines.
+pipelines based on given thresholds from selected pipelines.
 }
 \details{
 In the functions \code{plotMAD} and \code{plotNE}, detrended
 signals with value 0 will be at the same level as value 1 for
-giving pipelines by \code{unitFIdx}.
+giving pipelines by \code{unitReference}.
 }
 \examples{
 data(encodeCells)
-txFIdx <- encodeCells$genemeta$type == "protein_coding"
-hkIdx <- encodeCells$genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
+calibrationFeature <- encodeCells$genemeta$housekeeping
+unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 dat <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-txFIdx,hkIdx,unitFIdx)
+evaluationFeature,calibrationFeature,unitReference)
 }
 

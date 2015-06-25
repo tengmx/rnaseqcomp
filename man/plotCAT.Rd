@@ -4,7 +4,7 @@
 \alias{plotCAT}
 \title{CAT Plots of Differential Express Features}
 \usage{
-plotCAT(dat1, dat2, constant = NULL, microarray = NULL, infinity = FALSE,
+plotCAT(dat1, dat2, constant = NULL, otherFC = NULL, infinity = FALSE,
   step = 5L, type = "l", lwd = 2, col = NULL, lty = 1, xlim = c(20L,
   500L), ylim = c(0, 1), xlab = "Size of List",
   ylab = "Proportion in Common", cex.leg = 0.6, ...)
@@ -18,13 +18,13 @@ size of slot \code{quantData} and the same \code{repInfo}.}
 quantifications before fold changes calculation
 (default: NULL).}
 
-\item{microarray}{A numeric vector of fold change by
-microarray or other 'gold standard', with each elements
+\item{otherFC}{A numeric vector of fold changes by
+other independent technology such as microarray, with each elements
 corresponding to rows of \code{quantData} slot in \code{dat1}
 or \code{dat2}. Missing data NA allowed. (default: NULL)}
 
 \item{infinity}{A logical indicator that specify if fold change
-of infinity should be consitered. Functional only if \code{constant}
+of infinity should be considered. Functional only if \code{constant}
 is not a positive number. (default: FALSE)}
 
 \item{step}{Plot steps on x-axis (default: 5).}
@@ -52,8 +52,8 @@ by package \code{RColorBrewer}).}
 }
 \value{
 \item{CAT plot}{CAT plots for all the quantification pipelines.}
-\item{Precision or Accuaracy}{A numeric vector of pipeline
-precision or accuracy, depending on whether microarray is
+\item{Precision or Accuracy}{A numeric vector of pipeline
+precision or accuracy, depending on whether \code{otherFC} is
 provided.}
 }
 \description{
@@ -61,25 +61,25 @@ For each pipeline, 2 biological conditions
 (cell lines) each with 2 quantification replicates are
 compared and fold changes of each replicate are calculated.
 Then, CAT plots between replicates (precision) or between
-mean of replicates and microarray (accuracy).
+mean of replicates and other technology (accuracy).
 }
 \examples{
 data(encodeCells)
-txFIdx <- encodeCells$genemeta$type == "protein_coding"
-hkIdx <- encodeCells$genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
+calibrationFeature <- encodeCells$genemeta$housekeeping
+unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-txFIdx,hkIdx,unitFIdx)
+evaluationFeature,calibrationFeature,unitReference)
 dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,
-txFIdx,hkIdx,unitFIdx)
+evaluationFeature,calibrationFeature,unitReference)
 
 plotCAT(dat1,dat2)
-plotCAT(dat1,dat2,constant=1)
+plotCAT(dat1,dat2,infinity=TRUE)
 
 genes <- encodeCells$genemeta[encodeCells$genemeta$type ==
 "protein_coding", 1]
-microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-plotCAT(dat2,dat1,microarray=microarray)
-plotCAT(dat2,dat1,constant=1,microarray=microarray)
+otherFC <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
+plotCAT(dat2,dat1,otherFC=otherFC)
+plotCAT(dat2,dat1,constant=1,otherFC=otherFC)
 }
 

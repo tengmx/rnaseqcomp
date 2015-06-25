@@ -42,16 +42,16 @@ estimated automatically).}
 \description{
 For each pipeline, two quantification replicates
 are compared and log scale absolute deviations of signals are
-calculated. Then, loess smooths on absolute deviation are
-plotted stratefied by detrended log signals.
+calculated. Then, loess smooth on absolute deviation are
+plotted stratified by detrended log signals.
 }
 \examples{
 data(encodeCells)
-txFIdx <- encodeCells$genemeta$type == "protein_coding"
-hkIdx <- encodeCells$genemeta$housekeeping
-unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
+calibrationFeature <- encodeCells$genemeta$housekeeping
+unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 dat <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-txFIdx,hkIdx,unitFIdx)
+evaluationFeature,calibrationFeature,unitReference)
 plotMAD(dat)
 }
 

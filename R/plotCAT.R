@@ -4,7 +4,7 @@
 #' (cell lines) each with 2 quantification replicates are
 #' compared and fold changes of each replicate are calculated.
 #' Then, CAT plots between replicates (precision) or between
-#' mean of replicates and microarray (accuracy).
+#' mean of replicates and other technology (accuracy).
 #'
 #' @param dat1,dat2 \code{rnaseqcomp} S4 class objects for two
 #' conditions. \code{dat1} and \code{dat2} should have the same
@@ -13,10 +13,10 @@
 #' quantifications before fold changes calculation
 #' (default: NULL).
 #' @param infinity A logical indicator that specify if fold change
-#' of infinity should be consitered. Functional only if \code{constant}
+#' of infinity should be considered. Functional only if \code{constant}
 #' is not a positive number. (default: FALSE)
-#' @param microarray A numeric vector of fold change by
-#' microarray or other 'gold standard', with each elements
+#' @param otherFC A numeric vector of fold changes by
+#' other independent technology such as microarray, with each elements
 #' corresponding to rows of \code{quantData} slot in \code{dat1}
 #' or \code{dat2}. Missing data NA allowed. (default: NULL)
 #' @param step Plot steps on x-axis (default: 5).
@@ -36,31 +36,31 @@
 #'
 #' @return
 #' \item{CAT plot}{CAT plots for all the quantification pipelines.}
-#' \item{Precision or Accuaracy}{A numeric vector of pipeline
-#' precision or accuracy, depending on whether microarray is
+#' \item{Precision or Accuracy}{A numeric vector of pipeline
+#' precision or accuracy, depending on whether \code{otherFC} is
 #' provided.}
 #'
 #' @export
 #' @examples
 #' data(encodeCells)
-#' txFIdx <- encodeCells$genemeta$type == "protein_coding"
-#' hkIdx <- encodeCells$genemeta$housekeeping
-#' unitFIdx <- grepl("Cufflinks",encodeCells$repInfo)
+#' evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
+#' calibrationFeature <- encodeCells$genemeta$housekeeping
+#' unitReference <- grepl("Cufflinks",encodeCells$repInfo)
 #' dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-#' txFIdx,hkIdx,unitFIdx)
+#'     evaluationFeature,calibrationFeature,unitReference)
 #' dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,
-#' txFIdx,hkIdx,unitFIdx)
+#'     evaluationFeature,calibrationFeature,unitReference)
 #'
 #' plotCAT(dat1,dat2)
-#' plotCAT(dat1,dat2,constant=1)
+#' plotCAT(dat1,dat2,infinity=TRUE)
 #'
 #' genes <- encodeCells$genemeta[encodeCells$genemeta$type ==
-#' "protein_coding", 1]
-#' microarray <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-#' plotCAT(dat2,dat1,microarray=microarray)
-#' plotCAT(dat2,dat1,constant=1,microarray=microarray)
+#'     "protein_coding", 1]
+#' otherFC <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
+#' plotCAT(dat2,dat1,otherFC=otherFC)
+#' plotCAT(dat2,dat1,constant=1,otherFC=otherFC)
 
-plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL,
+plotCAT <- function(dat1, dat2, constant = NULL, otherFC = NULL,
                     infinity = FALSE, step = 5L,
                     type = 'l', lwd = 2, col = NULL, lty = 1,
                     xlim = c(20L, 500L), ylim = c(0, 1), xlab = "Size of List",
@@ -73,14 +73,14 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL,
     if(nrow(dat1@quantData) != nrow(dat2@quantData))
        stop('Rows are different between "dat1" and "dat2".')
     if(!is.null(constant) && (!is.numeric(constant) || constant < 0))
-        stop('"constant" is not correct.')
-    if(!is.null(microarray) && (!is.numeric(microarray) ||
-                                length(microarray) != nrow(dat1@quantData)))
-        stop('"microarray" should be numeric vector or NULL')
+        stop('"constant" must be a non-negative number or NULL.')
+    if(!is.null(otherFC) && (!is.numeric(otherFC) ||
+                   length(otherFC) != nrow(dat1@quantData)))
+        stop('"otherFC" must be numeric vector or NULL')
     if(!is.numeric(step) || step < 1)
-        stop('"step" should be natual number.')
+        stop('"step" should be a natural number.')
     if(!is.logical(infinity) || length(infinity) != 1)
-        stop('"infinity" should be a logical.')
+        stop('"infinity" must be a logical.')
     repInfo <- dat1@repInfo
     if(!is.null(constant)){
         dat1@quantData <- dat1@quantData + constant
@@ -91,13 +91,13 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL,
     cdList2 <- lapply(levels(repInfo), function(i)
                       dat2@quantData[ ,repInfo == i])
     # fold change
-    if(is.null(microarray)){
+    if(is.null(otherFC)){
         fcList <- lapply(seq_len(length(cdList1)), function(i)
                          log2(cdList1[[i]]) - log2(cdList2[[i]]))
     }else{
         fcList <- lapply(seq_len(length(cdList1)), function(i)
                          cbind(log2(rowMeans(cdList1[[i]])) -
-                               log2(rowMeans(cdList2[[i]])),microarray))
+                               log2(rowMeans(cdList2[[i]])),otherFC))
     }
     # handling 0s if no constant or constant is 0
     if(is.null(constant) || constant == 0){
@@ -105,7 +105,7 @@ plotCAT <- function(dat1, dat2, constant = NULL, microarray = NULL,
             fcList <- lapply(fcList, function(x) {
                 x[is.nan(x) | is.infinite(x)] <- 0
                 x })
-        }else if(is.null(microarray)){
+        }else if(is.null(otherFC)){
             fcList <- lapply(seq_len(length(fcList)), function(i){
                 x <- fcList[[i]]
                 x[is.nan(x)] <- 0

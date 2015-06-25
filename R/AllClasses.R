@@ -2,30 +2,30 @@
 #'
 #' @param object A object of S4 rnaseqcomp class
 #'
-#' @return TRUE, or charater if error happens.
+#' @return TRUE, or character if error happens.
 #'
 check_rnaseqcomp <- function(object) {
     errors <- character()
     repsnot2 <- sum(summary(object@repInfo) != 2)
     if(repsnot2 > 0 ){
-        msg <- "Replicates of each pipeline should be 2."
+        msg <- "Replicates of each pipeline must be 2."
         errors <- c(errors, msg)
     }
     negcells <- sum(object@quantData < 0, na.rm = TRUE)
     if(negcells > 0){
-        msg <- "'quantData' should be a non-negative matrix."
+        msg <- '"quantData" must be a non-negative matrix.'
         errors <- c(errors, msg)
     }
     if(ncol(object@quantData) != length(object@repInfo)){
-        msg <- "'quantData' column size should equal to 'refInfo' length."
+        msg <- '"quantData" column size must equal to "refInfo" length.'
         errors <- c(errors, msg)
     }
-    if(length(object@hkmed) != length(object@repInfo)){
-        msg <- "Size should be equivalent for 'refInfo' and 'hkmed'."
+    if(length(object@refMed) != length(object@repInfo)){
+        msg <- 'Size must be equivalent for "refInfo" and "refMed".'
         errors <- c(errors, msg)
     }
     if(length(object@scaler) > 1){
-        msg <- "'scaler' should be one single number."
+        msg <- '"scaler" must be one single number.'
         errors <- c(errors, msg)
     }
     if (length(errors) == 0) TRUE else errors
@@ -33,19 +33,30 @@ check_rnaseqcomp <- function(object) {
 
 #' @title rnaseqcomp
 #'
+#' @description
+#' This is a S4 class to organize data ready for benchmark summarization.
+#' There are 4 S3 objects inside this class. \code{quantData} documents the
+#' data matrix ready for evaluation by functions \code{plotMAD},
+#' \code{plotNE} or \code{plotCAT}. \code{repInfo} is a factor corresponding
+#' to columns of \code{quantData} with each level holding 2 elements exactly,
+#' normally the name of quantification methods. \code{refMed} is the median
+#' log2 signal of calibration references. \code{scaler} is a number that point
+#' to the median log2 signal of reference methods/units, which can be used to
+#' tune the detrended logSignal with 0 corresponding to 1 by reference units.
+#'
 #' @exportClass rnaseqcomp
 #'
 setClass(Class = "rnaseqcomp",
          representation = representation(
-             quantData = "matrix", repInfo = "factor",
-             hkmed = "numeric", scaler = "numeric"),
+         quantData = "matrix", repInfo = "factor",
+         refMed = "numeric", scaler = "numeric"),
          validity = check_rnaseqcomp)
 
 
 setMethod("show", "rnaseqcomp", function(object){
     cat("rnaseqcomp: Benchmark for RNA-seq quantification pipelines\n\n")
     cat("Reps:\n", as.character(object@repInfo), "\n\n")
-    cat("Calibration subset log2Median:\n", object@hkmed, "\n\n")
+    cat("Calibration subset log2Median:\n", object@refMed, "\n\n")
     cat("Detrened signal scaler:\n", object@scaler, "\n\n")
     rown <- nrow(object@quantData)
     coln <- ncol(object@quantData)

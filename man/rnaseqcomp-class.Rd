@@ -5,6 +5,14 @@
 \alias{rnaseqcomp-class}
 \title{rnaseqcomp}
 \description{
-rnaseqcomp
+This is a S4 class to organize data ready for benchmark summarization.
+There are 4 S3 objects inside this class. \code{quantData} documents the
+data matrix ready for evaluation by functions \code{plotMAD},
+\code{plotNE} or \code{plotCAT}. \code{repInfo} is a factor corresponding
+to columns of \code{quantData} with each level holding 2 elements exactly,
+normally the name of quantification methods. \code{refMed} is the median
+log2 signal of calibration references. \code{scaler} is a number that point
+to the median log2 signal of reference methods/units, which can be used to
+tune the detrended logSignal with 0 corresponding to 1 by reference units.
 }
 
