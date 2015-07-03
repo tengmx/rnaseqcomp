@@ -47,11 +47,11 @@ plotMAD <- function(dat, type='l', lwd = 2, col = NULL,
     cdList <- lapply(levels(dat@repInfo), function(i)
                      dat@quantData[, dat@repInfo == i])
     refMed <- lapply(levels(dat@repInfo), function(i)
-                    dat@refMed[dat@repInfo == i])
+                    median(dat@refMed[dat@repInfo == i]))
     # positive units to detrended log signal
     cdList <- lapply(seq_len(length(cdList)), function(i){
         tmp <- log2(cdList[[i]][which(apply(cdList[[i]], 1, min) > 0), ])
-        t(t(tmp) - refMed[[i]]) + dat@scaler
+        tmp - refMed[[i]] + dat@scaler
     })
     names(cdList) <- names(refMed) <- levels(dat@repInfo)
     # |M| ~ A
@@ -85,8 +85,9 @@ plotMAD <- function(dat, type='l', lwd = 2, col = NULL,
     }
     legend('topright', names(cdList), lwd = lwd, col = col,
            lty = lty, cex = cex.leg)
-    # MAD
-    cat("One number statistics: MAD\n")
-    return(sapply(sdlist, function(x) round(median(x[ ,2]) * 1.4826, 3)))
+    # MAD & SD
+    SD <- sapply(sdlist, function(x) round(sqrt(mean(x[ ,2]^2)), 3))
+    MAD <- sapply(sdlist, function(x) round(median(x[ ,2]) * 1.4826, 3))
+    return(list(mad = MAD,sd = SD))
 }
 
