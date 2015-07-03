@@ -6,7 +6,7 @@
 \usage{
 plotNE(dat, step = 0.1, type = "l", lwd = 2, col = NULL, lty = 1,
   xlim = NULL, ylim = NULL, cex.leg = 0.6, xlab = "Detrended logSignal",
-  ylab = "Reverse Accumulation Proportion of NE", ...)
+  ylab = "Proportion of discordant calls", ...)
 }
 \arguments{
 \item{dat}{A \code{rnaseqcomp} S4 class object.}
@@ -34,7 +34,7 @@ estimated automatically).}
 (default: 'Detrended logSignal').}
 
 \item{ylab}{Plot label of y-axis
-(default: 'Reverse Accumulation Proportion of NE'').}
+(default: 'Proportion of discordant calls').}
 
 \item{...}{Other parameters for base function \code{plot}.}
 }

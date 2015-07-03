@@ -139,6 +139,9 @@ plotCAT <- function(dat1, dat2, constant = NULL, otherFC = NULL,
     if(is.null(ylim)) ylim <- c(0, 1)
     # ranks and proportion of concordance
     ranks <- seq(max(xlim[1], 1L), min(xlim[2], nrow(dat1@quantData)), step)
+    threepoints <- c(50L,100L,250L)
+    threeidx <- threepoints >= ranks[1] & threepoints <= ranks[length(ranks)]
+    ranks <- sort(unique(c(ranks,threepoints[threeidx])))
     proplist <- lapply(seq_len(length(fcListAbs)), function(i){
         x <- fcListAbs[[i]]
         y <- fcList[[i]]
@@ -169,5 +172,5 @@ plotCAT <- function(dat1, dat2, constant = NULL, otherFC = NULL,
     }
     legend('bottomright', names(proplist), lwd = lwd, col = col,
            lty = lty, cex = cex.leg)
-    sapply(proplist, median)
+    return(lapply(proplist, function(x) x[match(threepoints,ranks)]))
 }

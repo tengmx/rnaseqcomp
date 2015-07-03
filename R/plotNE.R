@@ -21,7 +21,7 @@
 #' @param xlab Plot label of x-axis
 #' (default: 'Detrended logSignal').
 #' @param ylab Plot label of y-axis
-#' (default: 'Reverse Accumulation Proportion of NE'').
+#' (default: 'Proportion of discordant calls').
 #' @param ... Other parameters for base function \code{plot}.
 #'
 #' @import RColorBrewer
@@ -45,14 +45,14 @@
 plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
                    lty = 1, xlim = NULL, ylim = NULL, cex.leg = 0.6,
                    xlab = "Detrended logSignal",
-                   ylab = "Reverse Accumulation Proportion of NE",
+                   ylab = "Proportion of discordant calls",
                    ...){
     if(!is(dat,'rnaseqcomp'))
         stop('"plotNE" only plots class "rnaseqcomp".')
     cdList <- lapply(levels(dat@repInfo), function(i)
                      dat@quantData[ ,dat@repInfo == i])
     refMed <- lapply(levels(dat@repInfo), function(i)
-                    dat@refMed[dat@repInfo == i])
+                    median(dat@refMed[dat@repInfo == i]))
     # proportion of EE, NN & NE, missing data excluded
     pEE <- round(sapply(cdList, function(x)
                         mean(apply(x, 1, min) > 0, na.rm = TRUE)), 3)
@@ -63,7 +63,7 @@ plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
     neList <- lapply(seq_len(length(cdList)), function(i){
         tmp1 <- log2(cdList[[i]][which(apply(cdList[[i]], 1, min) <= 0 &
                                        apply(cdList[[i]], 1, max) > 0), ])
-        tmp2 <- t(t(tmp1) - refMed[[i]]) + dat@scaler
+        tmp2 <- tmp1 - refMed[[i]] + dat@scaler
         apply(tmp2 * !is.infinite(tmp2), 1, sum, na.rm = TRUE)
     })
     if(is.null(xlim))
@@ -78,7 +78,7 @@ plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
     if(is.null(ylim))
         ylim <- c(0, max(sapply(pnelist, function(x) max(x))))
     if(is.null(xlab))  xlab <- 'Detrended logSignal'
-    if(is.null(ylab))  ylab <- 'Reverse Accumulation Proportion of NE'
+    if(is.null(ylab))  ylab <- 'Proportion of discordant calls'
     if(is.null(col))   col <- brewer.pal(min(length(pnelist), 9), "Set1")
     col <- rep_len(col, length(pnelist))
     type <- rep_len(type, length(pnelist))
@@ -96,8 +96,7 @@ plotNE <- function(dat, step = 0.1, type = 'l', lwd = 2, col = NULL,
     }
     legend('topright', names(pnelist), lwd = lwd, col = col,
            lty = lty, cex = cex.leg)
-    dat <- cbind(pEE, pNE, pNN)
-    rownames(dat) <- names(pnelist)
-    return(dat)
+    names(pEE) <- names(pNE) <- names(pNN) <- names(pnelist)
+    return(list(pEE = pEE, pNE = pNE, pNN = pNN))
 }
 
