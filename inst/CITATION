@@ -1,11 +1,12 @@
 bibentry(bibtype = "Article",
-         title = paste0("rnaseqcomp: A Benchmark for RNA-Seq Quantification ",
-         "Pipelines Based on a Minimal Dataset"),
-         author = c(person("Mingxiang", "Teng"), person("Rafael", "Irizarry")),
-         journal = "In preparation",
+         title = paste0("A benchmark for RNA-Seq quantification ",
+         "pipelines based on a minimal dataset"),
+         author = c(person("Mingxiang", "Teng"), person("Carrie", "Davis"),
+                    person("Sarah", "Djebali"), person("Rafael", "Irizarry")),
+         journal = "Submitted",
          year = "2015",
          textVersion  =
-         paste0("Teng and Irizarry. In preparation. ",
-               "rnaseqcomp: A Benchmark for RNA-Seq Quantification Pipelines ",
-                "Based on a Minimal Dataset.")
+         paste0("Teng et al. ",
+               "A benchmark for RNA-Seq quantification pipelines ",
+                "based on a minimal dataset. Submitted.")
          )
