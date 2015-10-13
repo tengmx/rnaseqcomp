@@ -1,5 +1,5 @@
 Package: rnaseqcomp
-Version: 1.0.0
+Version: 1.1.0
 Title: Benchmark for RNA-seq Quantification Pipelines
 Description: Several quantitative and visualized benchmarks
     for RNA-seq quantification pipelines. Two-replicate
