@@ -1,15 +1,15 @@
-# rnaseqcomp: Benchmark for RNA-seq quantification pipelines
+# rnaseqcomp: Benchmarks for RNA-seq quantification pipelines
 
 ### Introduction
 RNA sequencing (RNA-seq) has been utilized as the standard technology for
 measuring the expression abundance of genes, transcripts, exons or splicing
 junctions. Numerous quantification methods were proposed to quantify such
-abundances with combination of some RNA-seq read aligner. Unfortunately, it
-is currently difficult to evaluate the performance of the best method, due
+abundances with/without combination of RNA-seq read aligners. 
+It is currently difficult to evaluate the performance of the best method, due
 in part to the high costs of running assessment experiments as well as the
 computational requirements of running these algorithms. **rnaseqcomp** package
 provides a series of statistical summaries and data visualization techniques
-to evaluate the performance of such quantification.
+to evaluate the performance of these metohods.
 
 ### Installation
 
