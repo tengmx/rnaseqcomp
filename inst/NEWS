@@ -6,5 +6,5 @@
     - Add infinity option in plotCAT
 * rnaseqcomp version 0.99.3 and 0.99.4
     - minor bugs fixed
-* rnaseqcomp version 1.0.1
+* rnaseqcomp version 1.0.1 & 1.0.2
     - functions changed with capability to be applied to large datasets

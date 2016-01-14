@@ -1,4 +1,4 @@
-#' @title Estimate And Plot Differential Expression Accuracy
+#' @title Estimate And Plot Differential Expression
 #'
 #' @description For each pipeline, differential expression is
 #' first estimated by fold change on 1 vs. 1 comparison between
@@ -30,16 +30,7 @@
 #' (default: seq(12, 0, len = 300))
 #' @param arrow A logical indicating if error bars should be added to
 #' the averaged ROC curves. (default: FALSE)
-#' @param lwd Plot line weights (default: 2).
-#' @param col Plot colors (default: NULL, colors are assigned
-#' by package \code{RColorBrewer}).
-#' @param lty Plot line styles (default: 1).
-#' @param cex.leg Legend size (default: 1).
-#' @param xlim Plot limits of x-axis (default: c(0, 0.2)).
-#' @param ylim Plot limits of y-axis (default: c(0, 1)).
-#' @param xlab Plot label of x-axis (default: 'FP').
-#' @param ylab Plot label of y-axis (default: 'TP').
-#' @param ... Other parameters for base function \code{plot}.
+#' @param ... Parameters for base function \code{plot}.
 #'
 #' @import RColorBrewer
 #'
@@ -59,17 +50,15 @@
 #' unitReference <- 1
 #' dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 #' calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-#' plotROC(dat,simdata$meta$positive,simdata$meta$fcsign,
-#' col=c("blue","orange"))
+#' plotROC(dat,simdata$meta$positive,simdata$meta$fcsign)
 
 
 
 plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
-                    thresholds = seq(12, 0, len = 300),
-                    arrow = FALSE, lwd = 2, col = NULL, lty = 1, cex.leg = 1,
-                    xlim = c(0, 0.2), ylim = c(0, 1),
-                    xlab = "FP", ylab = "TP",
+                    thresholds = seq(12, 0, len = 300), arrow = FALSE,
                     ...){
+    if(!is(dat, 'rnaseqcomp'))
+        stop('"plotSD" only plots class "rnaseqcomp".')
     dat@quantData <- lapply(dat@quantData, function(x) x + constant)
     cdList <- list()
     for(i in 1:2){
@@ -134,10 +123,21 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
             sdfprs[[i]][t] <- sd(fpr)
         }
     }
-    names(tprs) <- names(fprs) <- names(dat@quantData)
-    if(is.null(col))   col <- brewer.pal(min(length(proplist), 8), "Set2")
-    col <- rep_len(col, length(proplist))
-    lty <- rep_len(lty, length(proplist))
+    if(!exists('xlab'))  xlab <- 'FP'
+    if(!exists('ylab'))  ylab <- 'TP'
+    if(!exists('xlim')) xlim <- c(0, 0.2)
+    if(!exists('ylim')) ylim <- c(0, 1)
+    if(!exists('lty')) lty <- 1
+    if(!exists('lwd')) lwd <- 2
+    if(is.function(col)) {
+        if(length(dat@quantData)<3)
+            col <- c("blue","orange")[seq_along(dat@quantData)]
+        else {
+            col <- brewer.pal(min(length(dat@quantData), 8), "Set2")
+        }
+    }
+    lty <- rep_len(lty, length(dat@quantData))
+    col <- rep_len(col, length(dat@quantData))
     for(i in seq_len(length(proplist))){
         x <- fprs[[i]]
         y <- tprs[[i]]
@@ -146,7 +146,7 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
         if(i == 1) {
             plot(x, y, type = 'l', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
-                 xlab = xlab, ylab = ylab,  ...)
+                 xlab = xlab, ylab = ylab)
         }else {
             lines(x,y, lwd = lwd, col = col[i], lty = lty[i])
         }
@@ -159,8 +159,8 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
         }
     }
     abline(a = 0,b = 1,lty = 2)
-    legend('topleft', names(tprs), lwd = lwd, col = col,
-           lty = lty, cex = cex.leg, bty = "n")
+    legend('topleft', names(dat@quantData), lwd = lwd, col = col,
+           lty = lty, cex = 1, bty = "n")
     AUC <- sapply(seq_along(tprs), function(i){
         tpr <- tprs[[i]]
         fpr <- fprs[[i]]
@@ -180,5 +180,5 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
     })
     pAUC <- ((AUC - xlim[2]^2 / 2) / (xlim[2] - xlim[2]^2 / 2) + 1) / 2
     names(pAUC) <- names(dat@quantData)
-    return(pAUC)
+    return(round(pAUC, 3))
 }

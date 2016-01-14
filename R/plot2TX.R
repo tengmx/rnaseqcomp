@@ -16,31 +16,21 @@
 #' for calculation and plotting the proportion difference.
 #' (default: 0.5)
 #' @param thresholds A vector of two numbers define cutoffs for
-#' three levels of detreded log signals. (default: c(1, 6))
-#' @param plotcell Either 1 or 2 indicating which cell line
-#' will be plotted. This won't affect estimation for both
+#' three levels of detreded log signals, where one number summary
+#' will be generated. (default: c(1, 6))
+#' @param plotcell 1 or 2 indicating which cell line
+#' will be plotted. If values other than 1 and 2, both cell
+#' lines will be plotted.  This value won't affect estimation for both
 #' cell lines. (default: 1)
-#' @param lwd Plot line weights (default: 2).
-#' @param col Plot colors (default: NULL, colors are assigned
-#' by package \code{RColorBrewer}).
-#' @param lty Plot line styles (default: 1).
-#' @param cex.leg Legend size (default: 1).
-#' @param xlim Plot limits of x-axis (default: NULL, limits are
-#' estimated automatically).
-#' @param ylim Plot limits of y-axis (default: NULL, limits are
-#' estimated automatically).
-#' @param xlab Plot label of x-axis
-#' (default: 'Detrended logSignal').
-#' @param ylab Plot label of y-axis
-#' (default: 'Mean difference of transcript proportions').
-#' @param ... Other parameters for base function \code{plot}.
+#' @param ... Parameters for base function \code{plot}.
 #'
 #' @import RColorBrewer
 #'
 #' @return
 #' \item{plot}{2TX plots of quantification pipelines for
 #' selected cell line by \code{plotcell}.}
-#' \item{2TX}{A list of two matrices of mean proportion difference.}
+#' \item{2TX}{A matrix of mean proportion difference. Valuesa are based
+#' on averageing two cell lines.}
 #'
 #' @export
 #' @examples
@@ -52,16 +42,11 @@
 #' unitReference <- 1
 #' dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 #' calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-#' plot2TX(dat,genes=simdata$meta$gene,col=c("blue","orange"))
+#' plot2TX(dat,genes=simdata$meta$gene)
 
 
-plot2TX <- function(dat, genes, step = 0.5,
-                    thresholds = c(1, 6), plotcell = 1,
-                    lwd=2, col = NULL, lty = 1, cex.leg = 1,
-                    xlim = NULL, ylim = NULL,
-                    xlab = "Detrended logSignal",
-                    ylab = "Mean difference of transcript proportions",
-                      ...){
+plot2TX <- function(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
+                    ...){
     if(!is(dat,'rnaseqcomp'))
         stop('"plot2TX" only plots class "rnaseqcomp".')
     cdList <- list()
@@ -99,55 +84,50 @@ plot2TX <- function(dat, genes, step = 0.5,
             A[[i]][[k]] <- tmp2
         }
     }
-    if(is.null(xlab))  xlab <- 'Detrended logSignal'
-    if(is.null(ylab))  ylab <- 'Mean difference of transcript proportions'
-    if(is.null(col))   col <- brewer.pal(min(length(M), 8), "Set2")
-    if(is.null(ylim))  ylim <- c(0,1)
-    if(is.null(xlim))  xlim <- c(0,12)
+    if(!exists('xlab'))  xlab <- 'Detrended logSignal'
+    if(!exists('ylab'))  ylab <- 'Mean difference of transcript proportions'
+    if(!exists('xlim'))  xlim <- c(0,12)
+    if(!exists('ylim'))  ylim <- c(0,1)
+    if(!exists('lty')) lty <- 1
+    if(!exists('lwd')) lwd <- 2
+    if(is.function(col)) {
+        if(length(dat@quantData)<3)
+            col <- c("blue","orange")[seq_along(dat@quantData)]
+        else {
+            col <- brewer.pal(min(length(dat@quantData), 8), "Set2")
+        }
+    }
+    lty <- rep_len(lty, length(dat@quantData))
+    col <- rep_len(col, length(dat@quantData))
     steps <- seq(xlim[1], xlim[2], step)
-    col <- rep_len(col, length(M))
-    lty <- rep_len(lty, length(M))
-    #prop0c1 <- round(1-sapply(A,function(x)
-    #                          sum(rowMeans(x[[1]])==0)/nrow(x[[1]])),2)
-    #prop0c2 <- round(1-sapply(A,function(x)
-    #                          sum(rowMeans(x[[2]])==0)/nrow(x[[2]])),2)
-    pnelist1 <- lapply(seq_len(length(M)), function(i){
-        sapply(seq_along(steps), function(j){
-           if(j==1){
-               idx <- rowMeans(A[[i]][[1]]) <= 2^steps[j] &
-                   rowMeans(A[[i]][[1]]) != 0
-           }else{
-               idx <- rowMeans(A[[i]][[1]]) <= 2^steps[j] &
-                   rowMeans(A[[i]][[1]]) > 2^steps[j-1]
-           }
-           if(sum(idx)==0) 0
-           else mean(abs(M[[i]][[1]][idx]))
-       })})
-    pnelist2 <- lapply(seq_len(length(M)), function(i){
-        sapply(seq_along(steps), function(j){
-            if(j==1){
-                idx <- rowMeans(A[[i]][[2]]) <= 2^steps[j] &
-                    rowMeans(A[[i]][[2]]) != 0
-            }else{
-                idx <- rowMeans(A[[i]][[2]]) <= 2^steps[j] &
-                    rowMeans(A[[i]][[2]]) > 2^steps[j-1]
-            }
-            if(sum(idx)==0) 0
-            else mean(abs(M[[i]][[2]][idx]))
-        })})
-    for(i in seq_along(pnelist1)){
+    pnelist <- list()
+    for(k in 1:2){
+        pnelist[[k]] <- lapply(seq_len(length(M)), function(i){
+            sapply(seq_along(steps), function(j){
+                if(j==1){
+                    idx <- rowMeans(A[[i]][[k]]) <= 2^steps[j] &
+                        rowMeans(A[[i]][[k]]) != 0
+                }else{
+                    idx <- rowMeans(A[[i]][[k]]) <= 2^steps[j] &
+                        rowMeans(A[[i]][[k]]) > 2^steps[j-1]
+                }
+                if(sum(idx)==0) 0
+                else mean(abs(M[[i]][[k]][idx]))
+            })})
+    }
+    for(i in seq_along(dat@quantData)){
         if(plotcell == 1){
-            ploty <- pnelist1[[i]]
+            ploty <- pnelist[[1]][[i]]
         }else if(plotcell == 2){
-            ploty <- pnelist2[[i]]
+            ploty <- pnelist[[2]][[i]]
         }else{
-            ploty <- pnelist1[[i]]
-            ploty2 <- pnelist2[[i]]
+            ploty <- pnelist[[1]][[i]]
+            ploty2 <- pnelist[[2]][[i]]
         }
         if(i == 1) {
             plot(steps, ploty, type = 'o', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
-                 xlab = xlab, ylab = ylab, ...)
+                 xlab = xlab, ylab = ylab)
         }else {
             lines(steps, ploty, lwd = lwd, col = col[i], lty = lty[i],
                   type = 'o')
@@ -160,36 +140,29 @@ plot2TX <- function(dat, genes, step = 0.5,
     box()
     if(plotcell %in% 1:2){
         legend('topright', names(dat@quantData),
-               lwd = lwd, col = col, lty = lty, bty = "n",cex = cex.leg)
+               lwd = lwd, col = col, lty = lty, bty = "n",cex = 1)
     }else{
         cells <- levels(dat@condInfo)
         legend('topright', c(names(dat@quantData), cells),
                lwd = lwd, col = c(col, rep("black", length(cells))),
-               lty = c(lty, lty[1], lty[1] + 2), bty = "n", cex = cex.leg)
+               lty = c(lty, lty[1], lty[1] + 2), bty = "n", cex = 1)
     }
-    cell1 <- sapply(seq_len(length(M)), function(i){
-        idx1 <- rowMeans(A[[i]][[1]]) <= 2^thresholds[1] &
-            rowMeans(A[[i]][[1]]) != 0
-        idx2 <- rowMeans(A[[i]][[1]]) < 2^thresholds[2] &
-            rowMeans(A[[i]][[1]]) > 2^thresholds[1]
-        idx3 <- rowMeans(A[[i]][[1]]) >= 2^thresholds[2]
-        c(mean(abs(M[[i]][[1]][idx1])), mean(abs(M[[i]][[1]][idx2])),
-          mean(abs(M[[i]][[1]][idx3])))
-       })
-    cell2 <- sapply(seq_len(length(M)), function(i){
-        idx1 <- rowMeans(A[[i]][[2]]) <= 2^thresholds[1] &
-            rowMeans(A[[i]][[2]]) != 0
-        idx2 <- rowMeans(A[[i]][[2]]) < 2^thresholds[2] &
-            rowMeans(A[[i]][[2]]) > 2^thresholds[1]
-        idx3 <- rowMeans(A[[i]][[2]]) >= 2^thresholds[2]
-        c(mean(abs(M[[i]][[2]][idx1])), mean(abs(M[[i]][[2]][idx2])),
-          mean(abs(M[[i]][[2]][idx3])))
-       })
-    colnames(cell1) <- colnames(cell2) <- names(dat@quantData)
-    rownames(cell1) <- rownames(cell2) <- c(paste0("A<=", thresholds[1]),
-                              paste0(thresholds[1], "<A<", thresholds[2]),
-                              paste0("A>=", thresholds[2]))
-    TX2 <- list(cell1 = cell1, cell2 = cell2)
-    names(TX2) <- levels(dat@condInfo)
-    return(TX2)
+    TX2s <- list()
+    for(k in 1:2){
+        TX2s[[k]] <- sapply(seq_len(length(M)), function(i){
+            idx1 <- rowMeans(A[[i]][[k]]) <= 2^thresholds[1] &
+                rowMeans(A[[i]][[k]]) != 0
+            idx2 <- rowMeans(A[[i]][[k]]) < 2^thresholds[2] &
+                rowMeans(A[[i]][[k]]) > 2^thresholds[1]
+            idx3 <- rowMeans(A[[i]][[k]]) >= 2^thresholds[2]
+            c(mean(abs(M[[i]][[k]][idx1])), mean(abs(M[[i]][[k]][idx2])),
+              mean(abs(M[[i]][[k]][idx3])))
+        })
+    }
+    TX2 <- (TX2s[[1]] + TX2s[[2]])/2
+    colnames(TX2) <- names(dat@quantData)
+    rownames(TX2) <- c(paste0("A<=", thresholds[1]),
+                       paste0(thresholds[1], "<A<", thresholds[2]),
+                       paste0("A>=", thresholds[2]))
+    return(round(TX2, 3))
 }
