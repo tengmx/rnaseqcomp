@@ -54,7 +54,7 @@
 #' unitReference <- 1
 #' dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 #' calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-#' plotNE(dat)
+#' plotNE(dat,col=c("blue","orange"))
 
 plotNE <- function(dat,  steps = seq(-0.5, 12, 0.5), Ks = 0:3,
                    pchK = seq_along(Ks) - 1, plotcell = 1,

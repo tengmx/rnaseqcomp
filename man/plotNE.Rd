@@ -75,6 +75,6 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-plotNE(dat)
+plotNE(dat,col=c("blue","orange"))
 }
 

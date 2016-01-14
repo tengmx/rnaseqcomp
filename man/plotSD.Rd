@@ -70,6 +70,6 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-plotSD(dat)
+plotSD(dat,col=c("blue","orange"))
 }
 

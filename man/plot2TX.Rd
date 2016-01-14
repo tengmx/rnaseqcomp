@@ -73,6 +73,6 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-plot2TX(dat,genes=simdata$meta$gene)
+plot2TX(dat,genes=simdata$meta$gene,col=c("blue","orange"))
 }
 

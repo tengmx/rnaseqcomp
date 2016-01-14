@@ -50,7 +50,7 @@
 #' unitReference <- 1
 #' dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 #' calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-#' plotSD(dat)
+#' plotSD(dat,col=c("blue","orange"))
 
 
 plotSD <- function(dat, constant = 0.5, loessspan = 1/3,

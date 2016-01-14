@@ -20,7 +20,6 @@
 #' @param plotcell Either 1 or 2 indicating which cell line
 #' will be plotted. This won't affect estimation for both
 #' cell lines. (default: 1)
-
 #' @param lwd Plot line weights (default: 2).
 #' @param col Plot colors (default: NULL, colors are assigned
 #' by package \code{RColorBrewer}).
@@ -53,7 +52,7 @@
 #' unitReference <- 1
 #' dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 #' calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-#' plot2TX(dat,genes=simdata$meta$gene)
+#' plot2TX(dat,genes=simdata$meta$gene,col=c("blue","orange"))
 
 
 plot2TX <- function(dat, genes, step = 0.5,

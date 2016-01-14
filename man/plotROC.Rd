@@ -82,6 +82,7 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-plotROC(dat,simdata$meta$positive,simdata$meta$fcsign)
+plotROC(dat,simdata$meta$positive,simdata$meta$fcsign,
+col=c("blue","orange"))
 }
 
