@@ -27,27 +27,27 @@ knitr::opts_chunk$set(dev="png",fig.show="hold",
 
 # Introduction
 
-RNA sequencing (RNA-seq) has been utilized as the standard technology for 
+RNA sequencing (RNA-seq) has been utilized as the standard technology for
 measuring the expression abundance of genes, transcripts, exons or splicing
 junctions. Numerous quantification methods were proposed to quantify such
-abundances with combination of some RNA-seq read aligner. Unfortunately, it
-is currently difficult to evaluate the performance of the best method, due
+abundances with/without combination of RNA-seq read aligners.
+It is currently difficult to evaluate the performance of the best method, due
 in part to the high costs of running assessment experiments as well as the
 computational requirements of running these algorithms. We have developed
 a series of statistical summaries and data visualization techniques to
-evaluate the performance of transcript quantification, particularly
-specificity and sensitivity.
+evaluate the performance of transcript quantification.
 
 The `rnaseqcomp` R-package performs comparisons and provides direct plots
-on these statistical summaries. It requires the inputs as an quantification
-table (or two, depending on which statistical comparisons is performed) by
-compared pipelines on a pair of RNA-seq samples. With necessary  meta
-information on these pipelines (*e.g.* names), a two step analysis will
+on these statistical summaries. It requires the inputs as a list of 
+quantification tables representing quantifications from 
+compared pipelines on a two condition dataset. With necessary meta
+information on these pipelines (*e.g.* names) and annotation information for
+quantified features (*e.g.* transcript information), a two step analysis will
 generate the desired evaluations.
 
-  1. Data filtering and data preparation. In this step, options are provided
+  1. Data filtering and data calibration. In this step, options are provided
   for any filtering and calibration operations on the raw data. A S4 class
-  `rnaseqcomp` object will be generated form next step.
+  `rnaseqcomp` object will be generated for next step.
   
   1. Statistical summary evaluation and visualization. Functions are provided
   for specificity and sensitivity evaluations.
@@ -62,18 +62,17 @@ library(rnaseqcomp)
 
 # Preparing Data
 
-As the benchmark evaluation is performed on a pair of RNA-seq replicates, a
-quantification table should contain $2n$ columns ($n$ corresponding to the
-number of pipeline compared), with each column representing a sample and each
-row representing a feature (*i.e.* genes, transcripts, exons, splicing
-junctions, etc.). The function `matrixFilter` takes this table as one of the
+For each compared pipeline, a quantification table should be a $m*n$ matrix,
+where $m$ corresponding to the number of quantified features (*e.g.* 
+transcripts) and $n$ corresponding to the number of samples. 
+The function `signalCalibrate` takes a list of these matrices as one of the
 inputs, with extra options such as meta information of pipelines, features
 for evaluation and features for calibration, and returns a S4 `rnaseqcomp`
 object that contains everything for downstream evaluation.
 
 There are several reasons why we need extra options in this step:
 
-  1. Meta information of pipelines basically is a factor to check the sanity
+  1. Meta information of pipelines basically are factors to check the sanity
   of table columns, and to provide unique names of pipelines for downstream
   analysis.
   
@@ -83,144 +82,148 @@ There are several reasons why we need extra options in this step:
   involved features. Thus, an option is offered for selecting subset of
   features.
   
-  1. Due to different pipelines reports different units of quantification,
-  such as FPKM (fragments per kilobases per million), RPKM (reads per
-  kilobases per million), TPM (transcripts per million) etc. Calibrations
-  across different units are necessary. Options are provided in the way that
-  on which features the calibrations are based and to what pipeline the
-  signals are mapped. 
+  1. Due to different pipelines might report different units of 
+  quantification, such as FPKM (fragments per kilobases per million), 
+  RPKM (reads per kilobases per million), TPM (transcripts per million) etc.
+  Calibrations across different pipelines are necessary. Options are 
+  provided in the way that on which features the calibrations are based 
+  and to what pipeline the signals are mapped. 
 
 We show here an example of selecting house-keeping genes[@eisenberg] for
-calibration and filtering protein coding genes for evaluation. In this
-vignette, we will use enbedded dataset `encodeCells` as examples to
-illustrate this package. This dataset contains two cell-line
-quantifications, GM12878 and K562, each with two PolyA dUTP technical 
-replicates by ENCODE project 
-[(https://www.encodeproject.org)](https://www.encodeproject.org).
-In total, quantifications from 9 pipelines are
-included. Here, 9 pipelines are made up with 6 quantification methods
-(RESM[@li], Cufflinks[@trapnell], FluxCapacitor[@montgomery],
-Sailfish[@patro], eXpress[@roberts] and Naive) in conjunction to 2 mapping
-algorithms (STAR[@dobin] and TopHat2[@kim]) and different tuning parameters.
+calibration and using all transcripts for evaluation. In this
+vignette, we will use enbedded dataset `simdata` as one example to
+illustrate this package. 
+
+This dataset include quantifications on 15776 transcripts on
+two cell lines each with 8 replicates. The true differential
+expressed transcripts were simulated. Quantifications from
+two pipelines (RSEM[@li] and FluxCapacitor[@montgomery]) are 
+included in this dataset.
 
 ```{r data}
 # load the dataset in this package
-data(encodeCells)
-class(encodeCells)
-names(encodeCells)
+data(simdata)
+class(simdata)
+names(simdata)
 ```
 
-Here, `gm12878` and `k562` are both quantification tables; repInfo is the meta
-information of pipelines; `genemeta` is the meta information for features:
-gene type and if house-keeping gene; arrayFC is fold change information
-between GM12878 and K562 cell lines from microarray platform[@ernst].
 
-In order to fit into function 'matrixFilter', necessary transformation to
+Here, quantifications are included in `simdata$quant`. Meta 
+information of transcripts is included in `simdata$meta`, 
+inlcuding if they belongs to house keeping genes and their simulated
+true fold change status. Sample information is included at `simdata$samp`.
+
+
+In order to fit into function 'signalCalibrate', necessary
+transformation to factors or
 logical vectors are needed for extra options.
 
 ```{r meta}
-evaluationFeature <- encodeCells$genemeta$type == "protein_coding"
-calibrationFeature <- encodeCells$genemeta$housekeeping
-unitReference <- grepl("Cufflinks",encodeCells$repInfo)
+condInfo <- factor(simdata$samp$condition)
+repInfo <- factor(simdata$samp$replicate)
+evaluationFeature <- rep(TRUE, nrow(simdata$meta))
+calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
+unitReference <- 1
 ```
 
-Generic function `show` is provided for bird-eye view of S4 `rnaseqcomp`
-object.
+Generic function `show` is provided to view general information
+of S4 `rnaseqcomp` object.
 
 ```{r filter}
-dat1 <- matrixFilter(encodeCells$gm12878,encodeCells$repInfo,
-    evaluationFeature,calibrationFeature,unitReference) 
-class(dat1)
-show(dat1)
+dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
+     calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
+class(dat)
+show(dat)
 ```
 
 # Visualizing Benchmarks
 
-Three type of QC metrics can be evaluated by this package. More details
+Four type of QC metrics can be evaluated by this package. More details
 please refer to our paper[@teng]. 
 
 ## Specificity on expressed features. 
 
 This metric is evaluated by the quantification deviations between RNA-seq
 technical replicates. Basically lower deviations indicate higher specificity.
-Both one number statistics and deviation stratified by express signals are
-provided.
+Both one number statistics and deviation stratified by expression signals are
+provided for each cell line. Specifically, the one number statistics are
+summarized separately based on three different levels of expression signals.
 
-```{r mad}
-plotMAD(dat1)
+```{r sd}
+plotSD(dat,col=c("blue","orange"),ylim=c(0,1.4))
 ```
 
 Detrended signals shown in the plot are actually the signals with the same
-scales as Cufflinks pipelines, as we selected `unitReference` as signals from
-Cufflinks. In this case, FPKM by Cufflinks.
+scales as RSEM pipeline, as we selected this pipeline as `unitReference`.
+In this case, TPM by RSEM. The returned metrics are separately for cell line
+1 and cell line 2. For row names of returned matrices, "A" means the 
+detrended log signals. Basicallly, this figure shows RSEM quantification has
+lower standard deviation than FluxCapacitor.
 
 ## Specificity on non-expressed features
 
 The proportions of non-expressed features is another important statistics.
-However, two types of non-expressed features should be analyzed separately:
+Two types of non-expressed features are analyzed simultaneously:
 
 ### Features expressed in one technical replicate but not the other.
 
-The reverse accumulated proportions of such either-or expressed features are
-plotted stratified by the detrended signals as described previously.
-Basically, a lower curve indicates higher specificity on these features.
-
-```{r nonexpplot}
-nonexpress <- plotNE(dat1)
-```
+Given a cutoff to define if one signal indicating express or non-express,
+a proportion of transcripts might express in one replicate but not the other
+in any compared two replicates. Thus, a lower proportion of such transcripts
+indicates a better specificity. We calculate the average of proportions from
+each two-replicate comparison as we have more than two replicates in each
+cell line.
 
 ### Features expressed in neither replicates, and others.
 
-Here, proportions of both expressed, both non-expressed and either-or
-expressed features are list as a table.
-```{r nonexpmat}
-nonexpress
+Using the same cutoffs as above, a proportion of transcripts might express
+in neither of compared replicates. This metric should be analyzed jointly with
+the metric above. For more details, refer to our paper[@teng].
+
+```{r nonexpplot}
+plotNE(dat,col=c("blue","orange"),xlim=c(0.5,1))
 ```
 
-## Specificity in differential analysis
+Here, y axis indicates express and non-express proportion, and x-axis
+indicates both non-express proportion. Again, the returned metrics are
+separately for cell line 1 and cell line 2. For row names of 
+returned matrices, "y" means the first metric and "x" means the second
+metric above, while 0,1,2,3 in the column names indicate corresponding 
+cutoffs.
 
-We calculate the fold change of features between two different cell-lines
-and compare the fold change concordance between two technical replicates.
-A strategy that summarizes the overlapped proportions among top differential
-expressed features is used, as we described before[@irizarry]. 
+## Specificity for genes only have two annotated transcripts
 
-```{r diffspec}
-dat2 <- matrixFilter(encodeCells$k562,encodeCells$repInfo,
-    evaluationFeature,calibrationFeature,unitReference) 
-plotCAT(dat1,dat2)
+For any compared two replicates in each cell line, the proportion
+of one transcript for genes that only include two annotated
+transcripts can be different even flipped. This section estimates
+and plots the proportion difference stratefied by detrended
+logsignal. Means of absolute difference will be reported for three
+levels of detrened logsignals. 
+
+
+```{r tx2}
+plot2TX(dat,genes=simdata$meta$gene,col=c("blue","orange"),ylim=c(0,0.6))
 ```
 
-Basically higher curve indicates better specificity. `plotCAT` also
-provides a one number summary of such specificity, which is the median of
-all overlap proportions plotted. In addition, constant is allowed for a
-more robust estimation of fold change.
-```{r,eval=FALSE}
-plotCAT(dat1,dat2,constant=1)
-```
+Basically higher curve indicates worse specificity for expression
+of genes that only have two transcripts. 
 
-Or, $y/0=inf$ with $y>0$ can be considered into fold changes by comparing
-$y$ only.
-```{r,eval=FALSE}
-plotCAT(dat1,dat2,infinity=TRUE)
-```
 
 ## Sensitivity in differential analysis
 
-There are other platforms provide the same quantifications such as microarray.
-We thus compare differential analysis of RNA-seq and other technology to
-evaluate sensitivity of pipelines. We have documented an object `arrayFC`
-which has been estimated from microarray technology[@ernst]. We don't
-document the steps how we calculated microarray fold change here, since it
-is beyond the scope of this vignette. 
+For each pipeline, differential expression is first estimated by
+fold change on 1 vs. 1 comparison between cell lines. ROC curves
+then are made by comparing fold changes with predefined true
+differentials. Then, ROC curves from multiple 1 vs. 1 comparisons
+are averaged using threshold averaging strategy. Standardized
+partial area under the curve (pAUC) is reported for each pipeline.
+
 
 ```{r diffsens}
-genes <- encodeCells$genemeta[encodeCells$genemeta$type == "protein_coding",1]
-otherFC <- encodeCells$arrayFC[match(genes,names(encodeCells$arrayFC))]
-plotCAT(dat2,dat1,constant=1,otherFC=otherFC)   
+plotROC(dat,simdata$meta$positive,simdata$meta$fcsign,col=c("blue","orange"),ylim=c(0,0.8))
 ```
 
-By comparing with microarray differential analysis, CAT plots will be plotted
-as higher curve indicates better sensitivity. 
+ 
 
 # References
 
