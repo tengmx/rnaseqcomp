@@ -3,7 +3,7 @@
 #' @description For any compared two replicates in each cell line,
 #' the proportion of one transcript for genes that only include two
 #' annotated transcripts can be different even flipped. This function
-#' estimate and plot the proportion difference stratefied by detrended
+#' estimates and plots the proportion difference stratefied by detrended
 #' logsignal. Means of absolute difference will be reported for three
 #' levels of detrened logsignals. Average is used when multiple
 #' two-replicate comparisons included.
