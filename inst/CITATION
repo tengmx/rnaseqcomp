@@ -6,6 +6,6 @@ bibentry(bibtype = "Article",
          year = "2015",
          textVersion  =
          paste0("Teng et al. ",
-               "Benchmark for RNA-Seq quantification pipelines",
+               "Benchmarks for RNA-Seq quantification pipelines",
                 ". Submitted.")
          )
