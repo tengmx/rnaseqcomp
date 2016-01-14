@@ -1,11 +1,11 @@
 bibentry(bibtype = "Article",
-         title = paste0("A benchmark for RNA-Seq quantification ",
-         "pipelines based on a minimal dataset"),
+         title = paste0("Benchmarks for RNA-Seq quantification ",
+         "pipelines"),
          author = "Teng et al.",
          journal = "Submitted",
          year = "2015",
          textVersion  =
          paste0("Teng et al. ",
-               "A benchmark for RNA-Seq quantification pipelines ",
-                "based on a minimal dataset. Submitted.")
+               "Benchmark for RNA-Seq quantification pipelines",
+                ". Submitted.")
          )
