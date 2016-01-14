@@ -6,22 +6,26 @@
 #'
 check_rnaseqcomp <- function(object) {
     errors <- character()
-    repsnot2 <- sum(summary(object@repInfo) != 2)
-    if(repsnot2 > 0 ){
-        msg <- "Replicates of each pipeline must be 2."
+    if(nlevels(object@condInfo) != 2){
+        msg <- "Not two cell lines included."
         errors <- c(errors, msg)
     }
-    negcells <- sum(object@quantData < 0, na.rm = TRUE)
+    negcells <- sum(sapply(object@quantData, function(x)
+                           sum(x<0, na.rm = TRUE)))
     if(negcells > 0){
-        msg <- '"quantData" must be a non-negative matrix.'
+        msg <- '"quantData" have negative matrix.'
         errors <- c(errors, msg)
     }
-    if(ncol(object@quantData) != length(object@repInfo)){
+    if(ncol(object@quantData[[1]]) != length(object@repInfo)){
         msg <- '"quantData" column size must equal to "refInfo" length.'
         errors <- c(errors, msg)
     }
-    if(length(object@refMed) != length(object@repInfo)){
-        msg <- 'Size must be equivalent for "refInfo" and "refMed".'
+    if(ncol(object@quantData[[1]]) != length(object@condInfo)){
+        msg <- '"quantData" column size must equal to "condInfo" length.'
+        errors <- c(errors, msg)
+    }
+    if(length(object@refMed) != length(object@quantData)){
+        msg <- 'Length must be equivalent for "refMed" and "quantData".'
         errors <- c(errors, msg)
     }
     if(length(object@scaler) > 1){
@@ -35,59 +39,31 @@ check_rnaseqcomp <- function(object) {
 #'
 #' @description
 #' This is a S4 class to organize data ready for benchmark summarization.
-#' There are 4 S3 objects inside this class. \code{quantData} documents the
-#' data matrix ready for evaluation by functions \code{plotMAD},
-#' \code{plotNE} or \code{plotCAT}. \code{repInfo} is a factor corresponding
-#' to columns of \code{quantData} with each level holding 2 elements exactly,
-#' normally the name of quantification methods. \code{refMed} is the median
-#' log2 signal of calibration references. \code{scaler} is a number that point
-#' to the median log2 signal of reference methods/units, which can be used to
-#' tune the detrended logSignal with 0 corresponding to 1 by reference units.
+#' There are 5 S3 objects inside this class. \code{quantData} documents a
+#' list of data matrices ready for evaluation by functions \code{plotSD},
+#' \code{plotNE}, \code{plot2TX} or \code{plotROC}. \code{condInfo} is a
+#' factor corresponding to columns of \code{quantData} matrices, indicating
+#' to which cell lines each sample belongs. \code{repInfo} is a factor
+#' corresponding to columns of \code{quantData} matrices indicating replicate
+#' information. \code{repInfo} is a legacy from previous versions, and
+#' doesn't have too much meanings in current version. \code{refMed} is the
+#' median log2 signal of calibration references. \code{scaler} is a number
+#' that point to the median log2 signal of reference pipeline. \code{refMed}
+#' and \code{scaler} were used to calibrate and generate \code{quantData}.
 #'
 #' @exportClass rnaseqcomp
 #'
 setClass(Class = "rnaseqcomp",
          representation = representation(
-         quantData = "matrix", repInfo = "factor",
-         refMed = "numeric", scaler = "numeric"),
+         quantData = "list", condInfo = "factor",
+         repInfo = "factor", refMed = "list", scaler = "numeric"),
          validity = check_rnaseqcomp)
 
 
 setMethod("show", "rnaseqcomp", function(object){
-    cat("rnaseqcomp: Benchmark for RNA-seq quantification pipelines\n\n")
-    cat("Reps:\n", as.character(object@repInfo), "\n\n")
-    cat("Calibration subset log2Median:\n", object@refMed, "\n\n")
-    cat("Detrened signal scaler:\n", object@scaler, "\n\n")
-    rown <- nrow(object@quantData)
-    coln <- ncol(object@quantData)
-    cat("Quantification data has ", rown,
-        " rows and ", coln, " columns:\n")
-    if(coln > 8 & rown > 10){
-        a <- object@quantData[1:4, 1:4]
-        b <- object@quantData[1:4, (coln-3):coln]
-        c <- object@quantData[(rown-3):rown, 1:4]
-        d <- object@quantData[(rown-3):rown, (coln-3):coln]
-        text <- rbind(data.frame(a, "...", b), "...",
-                      data.frame(c, "...", d))
-        colnames(text) <- c(as.character(object@repInfo[1:4]), ".",
-                            as.character(object@repInfo[(coln-3):coln]))
-        rownames(text)[5] <- "."
-    }else if (rown > 10){
-        a <- data.frame(object@quantData[1:4, ])
-        b <- data.frame(object@quantData[(rown-3):rown, ])
-        text <- rbind(a, "...", b)
-        colnames(text) <- as.character(object@repInfo)
-        rownames(text)[5] <- "."
-    }else if (coln > 8){
-        a <- data.frame(object@quantData[, 1:4])
-        b <- data.frame(object@quantData[, (coln-3):coln])
-        text <- cbind(a, "...", b)
-        colnames(text) <- c(as.character(object@repInfo[1:4]), ".",
-                            as.character(object@repInfo[(coln-3):coln]))
-    }else{
-        text <- data.frame(object@quantData)
-        colnames(text) <- as.character(object@repInfo)
-    }
-    print(text)
+    cat("rnaseqcomp: Benchmarks for RNA-seq quantification pipelines\n\n")
+    cat("Quantifications pipelins: ", length(object@quantData), "\n")
+    cat("Total transcripts: ", nrow(object@quantData[[1]]), "\n")
+    cat("Total samples from 2 conditions: ", ncol(object@quantData[[1]]), "\n")
 })
 

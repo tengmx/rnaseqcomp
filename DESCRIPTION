@@ -1,21 +1,25 @@
 Package: rnaseqcomp
-Version: 1.1.0
-Title: Benchmark for RNA-seq Quantification Pipelines
+Version: 1.1.1
+Title: Benchmarks for RNA-seq Quantification Pipelines
 Description: Several quantitative and visualized benchmarks
-    for RNA-seq quantification pipelines. Two-replicate
-    quantifications for genes, transcripts, junctions or 
-    exons by each pipeline with nessasery meta information 
-    should be organizd into numeric matrix in order to 
+    for RNA-seq quantification pipelines. Two-condition
+    quantifications for genes, transcripts, junctions or
+    exons by each pipeline with nessasery meta information
+    should be organizd into numeric matrices in order to
     proceed the evaluation.
 Author: Mingxiang Teng and Rafael A. Irizarry
 Maintainer: Mingxiang Teng <tengmx@gmail.com>
-Depends: 
+Depends:
     R (>= 3.2.0)
-Imports: 
-    RColorBrewer, methods
+Imports:
+    RColorBrewer,
+    methods
 VignetteBuilder: knitr
-Suggests: BiocStyle, knitr, rmarkdown
+Suggests:
+    BiocStyle,
+    knitr,
+    rmarkdown
 URL: https://github.com/tengmx/rnaseqcomp
 License: GPL-3
 biocViews: RNASeq, Visualization, QualityControl
-
+RoxygenNote: 5.0.1

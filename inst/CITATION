@@ -1,9 +1,7 @@
 bibentry(bibtype = "Article",
          title = paste0("A benchmark for RNA-Seq quantification ",
          "pipelines based on a minimal dataset"),
-         author = c(person(given = "Mingxiang", family = "Teng"),
-         person(family = "Others"),
-         person(given = c("Rafael", "A."), family = "Irizarry")),
+         author = "Teng et al.",
          journal = "Submitted",
          year = "2015",
          textVersion  =
