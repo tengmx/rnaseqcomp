@@ -65,7 +65,7 @@ three different levels of detrend logsignals are reported.
 data(simdata)
 condInfo <- factor(simdata$samp$condition)
 repInfo <- factor(simdata$samp$replicate)
-evaluationFeature <- rep(T, nrow(simdata$meta))
+evaluationFeature <- rep(TRUE, nrow(simdata$meta))
 calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
