@@ -73,6 +73,8 @@ plotSD <- function(dat, constant = 0.5, loessspan = 1/3,
     else lty <- para$lty
     if(!('lwd' %in% names(para))) lwd <- 2
     else lwd <- para$lwd
+    if(!('main' %in% names(para))) main <- "SD plot"
+    else main <- para$main
     if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
@@ -100,7 +102,7 @@ plotSD <- function(dat, constant = 0.5, loessspan = 1/3,
         if(i == 1) {
             plot(x$x, x$y, type = 'l', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
-                 xlab = xlab, ylab = ylab)
+                 xlab = xlab, ylab = ylab, main = main)
         }else {
             lines(x$x, x$y, lwd = lwd, col = col[i], lty = lty[i])
         }

@@ -136,6 +136,8 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
     else lty <- para$lty
     if(!('lwd' %in% names(para))) lwd <- 2
     else lwd <- para$lwd
+    if(!('main' %in% names(para))) main <- "ROC plot"
+    else main <- para$main
     if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
@@ -153,7 +155,7 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
         if(i == 1) {
             plot(x, y, type = 'l', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
-                 xlab = xlab, ylab = ylab)
+                 xlab = xlab, ylab = ylab, main = main)
         }else {
             lines(x,y, lwd = lwd, col = col[i], lty = lty[i])
         }

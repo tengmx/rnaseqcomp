@@ -82,6 +82,8 @@ plotNE <- function(dat,  steps = seq(-0.5, 12, 0.5), Ks = 0:3,
     else lty <- para$lty
     if(!('lwd' %in% names(para))) lwd <- 2
     else lwd <- para$lwd
+    if(!('main' %in% names(para))) main <- "NE plot"
+    else main <- para$main
     if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
@@ -108,7 +110,7 @@ plotNE <- function(dat,  steps = seq(-0.5, 12, 0.5), Ks = 0:3,
         if(i == 1) {
             plot(plotx, ploty, type = 'l', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
-                 xlab = xlab, ylab = ylab)
+                 xlab = xlab, ylab = ylab, main = main)
         }else {
             lines(plotx, ploty, lwd = lwd, col = col[i], lty = lty[i])
         }

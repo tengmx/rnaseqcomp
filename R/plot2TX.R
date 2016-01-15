@@ -98,6 +98,8 @@ plot2TX <- function(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
     else lty <- para$lty
     if(!('lwd' %in% names(para))) lwd <- 2
     else lwd <- para$lwd
+    if(!('main' %in% names(para))) main <- "2TX plot"
+        else main <- para$main
     if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
@@ -135,7 +137,7 @@ plot2TX <- function(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
         if(i == 1) {
             plot(steps, ploty, type = 'o', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
-                 xlab = xlab, ylab = ylab)
+                 xlab = xlab, ylab = ylab, main = main)
         }else {
             lines(steps, ploty, lwd = lwd, col = col[i], lty = lty[i],
                   type = 'o')

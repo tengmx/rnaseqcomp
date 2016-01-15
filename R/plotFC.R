@@ -80,6 +80,8 @@ plotFC <- function(dat, positive, fcsign, constant = 0.5, loessspan=1/3,
     else lty <- para$lty
     if(!('lwd' %in% names(para))) lwd <- 2
     else lwd <- para$lwd
+    if(!('main' %in% names(para))) main <- "FC plot"
+    else main <- para$main
     if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
@@ -96,7 +98,7 @@ plotFC <- function(dat, positive, fcsign, constant = 0.5, loessspan=1/3,
         if(i == 1) {
             plot(loessfit$x, loessfit$y, type = 'l', lwd = lwd,
                  col = col[i], ylim = ylim, xlim = xlim, xlab = xlab,
-                 ylab = ylab, lty = lty[i])
+                 ylab = ylab, lty = lty[i], main = main)
         }else {
             lines(loessfit$x, loessfit$y, lwd = lwd,
                    col = col[i], lty = lty[i])
