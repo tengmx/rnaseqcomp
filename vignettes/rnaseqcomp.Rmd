@@ -131,14 +131,15 @@ of S4 `rnaseqcomp` object.
 
 ```{r filter}
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
-     calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
+     calibrationFeature, unitReference, 
+     calibrationFeature2 = calibrationFeature)
 class(dat)
 show(dat)
 ```
 
 # Visualizing Benchmarks
 
-Four type of QC metrics can be evaluated by this package. More details
+Five type of QC metrics can be evaluated by this package. More details
 please refer to our paper[@teng]. 
 
 ## Specificity on expressed features. 
@@ -150,13 +151,13 @@ provided for each cell line. Specifically, the one number statistics are
 summarized separately based on three different levels of expression signals.
 
 ```{r sd}
-plotSD(dat,col=c("blue","orange"),ylim=c(0,1.4))
+plotSD(dat,ylim=c(0,1.4))
 ```
 
 Detrended signals shown in the plot are actually the signals with the same
 scales as RSEM pipeline, as we selected this pipeline as `unitReference`.
-In this case, TPM by RSEM. The returned metrics are separately for cell line
-1 and cell line 2. For row names of returned matrices, "A" means the 
+In this case, TPM by RSEM. In the returned matrix, values are based on average
+of two cell lines; the "A" in row names means the 
 detrended log signals. Basicallly, this figure shows RSEM quantification has
 lower standard deviation than FluxCapacitor.
 
@@ -181,15 +182,15 @@ in neither of compared replicates. This metric should be analyzed jointly with
 the metric above. For more details, refer to our paper[@teng].
 
 ```{r nonexpplot}
-plotNE(dat,col=c("blue","orange"),xlim=c(0.5,1))
+plotNE(dat,xlim=c(0.5,1))
 ```
 
 Here, y axis indicates express and non-express proportion, and x-axis
-indicates both non-express proportion. Again, the returned metrics are
-separately for cell line 1 and cell line 2. For row names of 
-returned matrices, "y" means the first metric and "x" means the second
-metric above, while 0,1,2,3 in the column names indicate corresponding 
-cutoffs.
+indicates both non-express proportion. Again, the returned values are
+based on average of two cell lines, while "NE" matrix represents
+express and non-express proportions and "NN" matrix represents both
+non-express proportions. For row names of 
+returned matrices, 0,1,2,3 indicate corresponding cutoffs.
 
 ## Specificity for genes only have two annotated transcripts
 
@@ -197,33 +198,51 @@ For any compared two replicates in each cell line, the proportion
 of one transcript for genes that only include two annotated
 transcripts can be different even flipped. This section estimates
 and plots the proportion difference stratefied by detrended
-logsignal. Means of absolute difference will be reported for three
+logsignal. Averages of absolute difference will be reported for three
 levels of detrened logsignals. 
 
 
 ```{r tx2}
-plot2TX(dat,genes=simdata$meta$gene,col=c("blue","orange"),ylim=c(0,0.6))
+plot2TX(dat,genes=simdata$meta$gene,ylim=c(0,0.6))
 ```
 
 Basically higher curve indicates worse specificity for expression
-of genes that only have two transcripts. 
+of genes that only have two transcripts. The returned matrix is
+based on three different levels of A. Similar explanation can be
+found as *plotSD*.
 
 
-## Sensitivity in differential analysis
+## Sensitivity and accuracy in differential analysis
 
+### ROC curves
 For each pipeline, differential expression is first estimated by
 fold change on 1 vs. 1 comparison between cell lines. ROC curves
 then are made by comparing fold changes with predefined true
-differentials. Then, ROC curves from multiple 1 vs. 1 comparisons
+differentials. ROC curves from multiple 1 vs. 1 comparisons
 are averaged using threshold averaging strategy. Standardized
 partial area under the curve (pAUC) is reported for each pipeline.
 
 
-```{r diffsens}
-plotROC(dat,simdata$meta$positive,simdata$meta$fcsign,col=c("blue","orange"),ylim=c(0,0.8))
+```{r diffroc}
+plotROC(dat,simdata$meta$positive,simdata$meta$fcsign,ylim=c(0,0.8))
 ```
 
- 
+### Distribution of estimated fold changes
+For each pipeline, differential expression is estimated by fold
+change on mean signals across replicates of cell lines. For
+features that are truely differential expressed, their fold
+changes levels are summarized based on different levels of
+detrended logsignals.
+
+```{r difffc}
+simdata$meta$fcsign[simdata$meta$fcstatus == "off.on"] <- NA
+plotFC(dat,simdata$meta$positive,simdata$meta$fcsign,ylim=c(0,1.2))
+```
+Here, in the embeded simulated data. Several transcripts are simulated
+as on and off pattern, meaning expressed in one cell line and no signal
+at all in the other cell line. Those transcripts might bias the true
+distribution we want. So we ignored those transcripts by setting their
+true signs of fold changes to NA.
 
 # References
 
