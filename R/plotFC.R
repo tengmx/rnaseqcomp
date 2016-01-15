@@ -67,19 +67,26 @@ plotFC <- function(dat, positive, fcsign, constant = 0.5, loessspan=1/3,
         x <- x[which(positive & !is.na(fcsign)), ]
         x
     })
-    if(!exists('xlab'))  xlab <- 'Detrended logSignal'
-    if(!exists('ylab'))  ylab <- 'log2FoldChange'
-    if(!exists('xlim')) xlim <- c(-1, 12)
-    if(!exists('ylim')) ylim <- c(0, 1.5)
-    if(!exists('lty')) lty <- 1
-    if(!exists('lwd')) lwd <- 2
-    if(is.function(col)) {
+    para <- list(...)
+    if(!('xlab' %in% names(para)))  xlab <- 'Detrended logSignal'
+    else xlab <- para$xlab
+    if(!('ylab' %in% names(para)))  ylab <- 'log2FoldChange'
+    else ylab <- para$ylab
+    if(!('xlim' %in% names(para)))  xlim <- c(-1, 12)
+    else xlim <- para$xlim
+    if(!('ylim' %in% names(para)))  ylim <- c(0, 1.5)
+    else ylim <- para$ylim
+    if(!('lty' %in% names(para))) lty <- 1
+    else lty <- para$lty
+    if(!('lwd' %in% names(para))) lwd <- 2
+    else lwd <- para$lwd
+    if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
         else {
             col <- brewer.pal(min(length(dat@quantData), 8), "Set2")
         }
-    }
+    }else col <- para$col
     lty <- rep_len(lty, length(dat@quantData))
     col <- rep_len(col, length(dat@quantData))
     for(i in seq_along(fcList1)){

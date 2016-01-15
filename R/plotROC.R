@@ -123,19 +123,26 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
             sdfprs[[i]][t] <- sd(fpr)
         }
     }
-    if(!exists('xlab'))  xlab <- 'FP'
-    if(!exists('ylab'))  ylab <- 'TP'
-    if(!exists('xlim')) xlim <- c(0, 0.2)
-    if(!exists('ylim')) ylim <- c(0, 1)
-    if(!exists('lty')) lty <- 1
-    if(!exists('lwd')) lwd <- 2
-    if(is.function(col)) {
+    para <- list(...)
+    if(!('xlab' %in% names(para)))  xlab <- 'FP'
+    else xlab <- para$xlab
+    if(!('ylab' %in% names(para)))  ylab <- 'TP'
+    else ylab <- para$ylab
+    if(!('xlim' %in% names(para)))  xlim <- c(0, 0.2)
+    else xlim <- para$xlim
+    if(!('ylim' %in% names(para)))  ylim <- c(0, 1)
+    else ylim <- para$ylim
+    if(!('lty' %in% names(para))) lty <- 1
+    else lty <- para$lty
+    if(!('lwd' %in% names(para))) lwd <- 2
+    else lwd <- para$lwd
+    if(!('col' %in% names(para))) {
         if(length(dat@quantData)<3)
             col <- c("blue","orange")[seq_along(dat@quantData)]
         else {
             col <- brewer.pal(min(length(dat@quantData), 8), "Set2")
         }
-    }
+    }else col <- para$col
     lty <- rep_len(lty, length(dat@quantData))
     col <- rep_len(col, length(dat@quantData))
     for(i in seq_len(length(proplist))){
