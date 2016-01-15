@@ -4,10 +4,7 @@
 \alias{plot2TX}
 \title{Estimate And Plot Transcript Proportion Difference}
 \usage{
-plot2TX(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
-  lwd = 2, col = NULL, lty = 1, cex.leg = 1, xlim = NULL,
-  ylim = NULL, xlab = "Detrended logSignal",
-  ylab = "Mean difference of transcript proportions", ...)
+plot2TX(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1, ...)
 }
 \arguments{
 \item{dat}{A \code{rnaseqcomp} S4 class object.}
@@ -21,39 +18,21 @@ for calculation and plotting the proportion difference.
 (default: 0.5)}
 
 \item{thresholds}{A vector of two numbers define cutoffs for
-three levels of detreded log signals. (default: c(1, 6))}
+three levels of detreded log signals, where one number summary
+will be generated. (default: c(1, 6))}
 
-\item{plotcell}{Either 1 or 2 indicating which cell line
-will be plotted. This won't affect estimation for both
+\item{plotcell}{1 or 2 indicating which cell line
+will be plotted. If values other than 1 and 2, both cell
+lines will be plotted.  This value won't affect estimation for both
 cell lines. (default: 1)}
 
-\item{lwd}{Plot line weights (default: 2).}
-
-\item{col}{Plot colors (default: NULL, colors are assigned
-by package \code{RColorBrewer}).}
-
-\item{lty}{Plot line styles (default: 1).}
-
-\item{cex.leg}{Legend size (default: 1).}
-
-\item{xlim}{Plot limits of x-axis (default: NULL, limits are
-estimated automatically).}
-
-\item{ylim}{Plot limits of y-axis (default: NULL, limits are
-estimated automatically).}
-
-\item{xlab}{Plot label of x-axis
-(default: 'Detrended logSignal').}
-
-\item{ylab}{Plot label of y-axis
-(default: 'Mean difference of transcript proportions').}
-
-\item{...}{Other parameters for base function \code{plot}.}
+\item{...}{Parameters for base function \code{plot}.}
 }
 \value{
 \item{plot}{2TX plots of quantification pipelines for
 selected cell line by \code{plotcell}.}
-\item{2TX}{A list of two matrices of mean proportion difference.}
+\item{2TX}{A matrix of mean proportion difference. Valuesa are based
+on averageing two cell lines.}
 }
 \description{
 For any compared two replicates in each cell line,
@@ -73,6 +52,6 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-plot2TX(dat,genes=simdata$meta$gene,col=c("blue","orange"))
+plot2TX(dat,genes=simdata$meta$gene)
 }
 

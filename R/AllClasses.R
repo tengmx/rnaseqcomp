@@ -24,6 +24,10 @@ check_rnaseqcomp <- function(object) {
         msg <- '"quantData" column size must equal to "condInfo" length.'
         errors <- c(errors, msg)
     }
+    if(length(object@quantData)<1){
+        msg <- '"quantData" must have at least one matrix.'
+        errors <- c(errors, msg)
+    }
     if(length(object@refMed) != length(object@quantData)){
         msg <- 'Length must be equivalent for "refMed" and "quantData".'
         errors <- c(errors, msg)
