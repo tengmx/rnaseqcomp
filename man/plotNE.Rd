@@ -5,9 +5,7 @@
 \title{Estimate And Plot Express And Non-express Features}
 \usage{
 plotNE(dat, steps = seq(-0.5, 12, 0.5), Ks = 0:3, pchK = seq_along(Ks) -
-  1, plotcell = 1, lwd = 2, col = NULL, lty = 1, cex.leg = 1,
-  xlim = NULL, ylim = NULL, xlab = "\% of detrended logSignal below K",
-  ylab = "\% of disagreement between replicates", ...)
+  1, plotcell = 1, ...)
 }
 \arguments{
 \item{dat}{A \code{rnaseqcomp} S4 class object.}
@@ -21,42 +19,21 @@ and to which the reported proportions to be corresponding.}
 \item{pchK}{Plot styles of highlight points corresponding
 to \code{Ks}. (default: seq_along(Ks) - 1)}
 
-\item{plotcell}{Either 1 or 2 indicating which cell line
-will be plotted. This won't affect estimation for both
+\item{plotcell}{1 or 2 indicating which cell line
+will be plotted. If values other than 1 and 2, both cell
+lines will be plotted.  This value won't affect estimation for both
 cell lines. (default: 1)}
 
-\item{lwd}{Plot line weights (default: 2).}
-
-\item{col}{Plot colors (default: NULL, colors are assigned
-by package \code{RColorBrewer}).}
-
-\item{lty}{Plot line styles (default: 1).}
-
-\item{cex.leg}{Legend size (default: 1).}
-
-\item{xlim}{Plot limits of x-axis (default: NULL, limits are
-estimated automatically).}
-
-\item{ylim}{Plot limits of y-axis (default: NULL, limits are
-estimated automatically).}
-
-\item{xlab}{Plot label of x-axis.
-(default: 'Proportion of detrended logSignal below K')}
-
-\item{ylab}{Plot label of y-axis.
-(default: 'Proportion of disagreement between replicates')}
-
-\item{...}{Other parameters for base function \code{plot}.}
+\item{...}{Parameters for base function \code{plot}.}
 }
 \value{
 \item{plot}{NE plots of quantification pipelines for
 selected cell line by \code{plotcell}.}
-\item{NE}{A list of sub-list with each sub-list corresponding to
-one cell line. Each element of sub-list is one 2*n matrix for
-one pipeline, where \code{n=length(Ks)}. The first row of
-matrix gives the proportion
-of disagreement and the second row gives the proportion of both
-replicates under (non-express) correspoinding cutoff \code{Ks}.}
+\item{NE}{A list of two matrices. The first matrix gives
+the proportion of disagreement and the second matrix gives the
+proportion of both replicates under (non-express)
+correspoinding cutoff \code{Ks}. Values are based on average
+of two cell lines.}
 }
 \description{
 For each cell line, any compared two replicates
@@ -75,6 +52,6 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
-plotNE(dat,col=c("blue","orange"))
+plotNE(dat)
 }
 
