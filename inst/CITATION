@@ -1,11 +1,22 @@
 bibentry(bibtype = "Article",
-         title = paste0("Benchmarks for RNA-Seq quantification ",
-         "pipelines"),
-         author = "Teng et al.",
-         journal = "Submitted",
-         year = "2015",
+         title = "A benchmark for RNA-seq quantification pipelines",
+         author =
+         paste0("Mingxiang Teng, Michael I. Love, Carrie A. Davis, ",
+                "Sarah Djebali, Alexander Dobin, Brenton R. Graveley, ",
+                "Sheng Li, Christopher E. Mason, Sara Olson, Dmitri ",
+                "Pervouchine, Cricket A. Sloan, Xintao Wei, Lijun Zhan ",
+                "and Rafael A. Irizarry"),
+         journal = "Genome Biology",
+         volume = '17',
+         number = "1",
+         pages = "74",
+         year = "2016",
          textVersion  =
-         paste0("Teng et al. ",
-               "Benchmarks for RNA-Seq quantification pipelines.",
-                " Submitted.")
+         paste0("Teng M, Love MI, Davis CA, ",
+                "Djebali S, Dobin A, Graveley BR, ",
+                "Li S, Mason CE, Olson S, ",
+                "Pervouchine D, Sloan CA, Wei X, Zhan L ",
+                "and Irizarry RA (2016). ",
+                "A benchmarks for RNA-seq quantification pipelines. ",
+                "Genome Biology,17(1):74.")
          )
