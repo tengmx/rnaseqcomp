@@ -62,9 +62,9 @@ library(rnaseqcomp)
 
 # Preparing Data
 
-For each compared pipeline, a quantification table should be a $m*n$ matrix,
-where $m$ corresponding to the number of quantified features (*e.g.* 
-transcripts) and $n$ corresponding to the number of samples. 
+For each compared pipeline, a quantification table should be a $m*n$ 
+matrix, where $m$ corresponding to the number of quantified features 
+(*e.g.* transcripts) and $n$ corresponding to the number of samples. 
 The function `signalCalibrate` takes a list of these matrices as one of the
 inputs, with extra options such as meta information of pipelines, features
 for evaluation and features for calibration, and returns a S4 `rnaseqcomp`
@@ -76,11 +76,11 @@ There are several reasons why we need extra options in this step:
   of table columns, and to provide unique names of pipelines for downstream
   analysis.
   
-  1. Since there might be dramatic quantification difference between different
-  features, *e.g.* between protein coding genes and lincRNA genes, evaluations
-  based on a subset of features can provide stronger robustness than using all
-  involved features. Thus, an option is offered for selecting subset of
-  features.
+  1. Since there might be dramatic quantification difference between 
+  different   features, *e.g.* between protein coding genes and lincRNA 
+  genes, evaluations based on a subset of features can provide stronger
+  robustness than using all involved features. Thus, an option is offered
+  for selecting subset of features.
   
   1. Due to different pipelines might report different units of 
   quantification, such as FPKM (fragments per kilobases per million), 
@@ -88,15 +88,20 @@ There are several reasons why we need extra options in this step:
   Calibrations across different pipelines are necessary. Options are 
   provided in the way that on which features the calibrations are based 
   and to what pipeline the signals are mapped. 
+  
+  1. Annotations for features basically provide the differential expression
+  status and meta relationships between different kinds of features, such as
+  which transcripts belong to which genes.
 
-We show here an example of selecting house-keeping genes[@eisenberg] for
+We show here an example of selecting house-keeping genes[@eisenberg] on
+chromosome 1 for
 calibration and using all transcripts for evaluation. In this
 vignette, we will use enbedded dataset `simdata` as one example to
 illustrate this package. 
 
 This dataset include quantifications on 15776 transcripts on
-two cell lines each with 8 replicates. The true differential
-expressed transcripts were simulated. Quantifications from
+two simulated cell lines each with 8 replicates. The true differential
+expressed transcripts were simulated. Illustration quantifications from
 two pipelines (RSEM[@li] and FluxCapacitor[@montgomery]) are 
 included in this dataset.
 
@@ -114,9 +119,9 @@ inlcuding if they belongs to house keeping genes and their simulated
 true fold change status. Sample information is included at `simdata$samp`.
 
 
-In order to fit into function 'signalCalibrate', necessary
+In order to fit into function `signalCalibrate`, necessary
 transformation to factors or
-logical vectors are needed for extra options.
+logical vectors are needed for extra options as shown below.
 
 ```{r meta}
 condInfo <- factor(simdata$samp$condition)
@@ -126,8 +131,8 @@ calibrationFeature <- simdata$meta$house & simdata$meta$chr == 'chr1'
 unitReference <- 1
 ```
 
-Generic function `show` is provided to view general information
-of S4 `rnaseqcomp` object.
+The return value of `signalCalibrate` is a S4 `rnaseqcomp` object,
+of which general information can be viewed by generic function `show`.
 
 ```{r filter}
 dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
@@ -139,16 +144,18 @@ show(dat)
 
 # Visualizing Benchmarks
 
-Five type of QC metrics can be evaluated by this package. More details
-please refer to our paper[@teng]. 
+Five type of QC metrics can be evaluated by this package currently. 
+Please refer to our paper for more details[@teng]. 
 
 ## Specificity on expressed features. 
 
 This metric is evaluated by the quantification deviations between RNA-seq
 technical replicates. Basically lower deviations indicate higher specificity.
-Both one number statistics and deviation stratified by expression signals are
-provided for each cell line. Specifically, the one number statistics are
-summarized separately based on three different levels of expression signals.
+Both one number statistics and graphes of standard deviations stratified by
+expression signals are provided. Specifically, the one number statistics are
+summarized separately based on three different levels of expression signals,
+as standard deviation does change dramatically with different levels of 
+expression.
 
 ```{r sd}
 plotSD(dat,ylim=c(0,1.4))
@@ -156,8 +163,8 @@ plotSD(dat,ylim=c(0,1.4))
 
 Detrended signals shown in the plot are actually the signals with the same
 scales as RSEM pipeline, as we selected this pipeline as `unitReference`.
-In this case, TPM by RSEM. In the returned matrix, values are based on average
-of two cell lines; the "A" in row names means the 
+In this case, TPM by RSEM. In the returned matrix, values are based on 
+average of two cell lines; the "A" in row names means the 
 detrended log signals. Basicallly, this figure shows RSEM quantification has
 lower standard deviation than FluxCapacitor.
 
@@ -175,11 +182,11 @@ indicates a better specificity. We calculate the average of proportions from
 each two-replicate comparison as we have more than two replicates in each
 cell line.
 
-### Features expressed in neither replicates, and others.
+### Features expressed in neither replicates.
 
 Using the same cutoffs as above, a proportion of transcripts might express
-in neither of compared replicates. This metric should be analyzed jointly with
-the metric above. For more details, refer to our paper[@teng].
+in neither of compared replicates. This metric should be analyzed jointly
+with the metric above. For more details, please refer to our paper[@teng].
 
 ```{r nonexpplot}
 plotNE(dat,xlim=c(0.5,1))
@@ -190,7 +197,7 @@ indicates both non-express proportion. Again, the returned values are
 based on average of two cell lines, while "NE" matrix represents
 express and non-express proportions and "NN" matrix represents both
 non-express proportions. For row names of 
-returned matrices, 0,1,2,3 indicate corresponding cutoffs.
+returned matrices above, 0,1,2,3 indicate corresponding cutoffs.
 
 ## Specificity for genes only have two annotated transcripts
 
@@ -208,11 +215,11 @@ plot2TX(dat,genes=simdata$meta$gene,ylim=c(0,0.6))
 
 Basically higher curve indicates worse specificity for expression
 of genes that only have two transcripts. The returned matrix is
-based on three different levels of A. Similar explanation can be
-found as *plotSD*.
+based on three different levels of detrended logsignals. Similar
+explanation can be found as *plotSD*.
 
 
-## Sensitivity and accuracy in differential analysis
+## Sensitivity in differential analysis
 
 ### ROC curves
 For each pipeline, differential expression is first estimated by
@@ -240,9 +247,19 @@ plotFC(dat,simdata$meta$positive,simdata$meta$fcsign,ylim=c(0,1.2))
 ```
 Here, in the embeded simulated data. Several transcripts are simulated
 as on and off pattern, meaning expressed in one cell line and no signal
-at all in the other cell line. Those transcripts might bias the true
-distribution we want. So we ignored those transcripts by setting their
-true signs of fold changes to NA.
+at all in the other. Those transcripts might bias the true
+distribution we want, since their fold change could be infinity.
+So we ignored those transcripts by setting their
+true signs of fold changes to NA before running the function "plotFC".
+
+# Summary
+
+In this vignette, we basically go through the major functions included
+in this package, and try to illustrate how they work. The data used is
+actually partial of the data as we shown in our paper. We demonstrate
+that by combining these metrics together, one can easily get how 
+their running pipeline performances are and make further 
+decisions baed on that.
 
 # References
 

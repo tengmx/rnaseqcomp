@@ -31,7 +31,8 @@
 #'
 #' @return
 #' \item{plot}{Fold change plots for all the quantification pipelines.}
-#' \item{FC}{A numeric vector indicating median fold changes in three
+#' \item{list}{A list of two numeric vectors indicating median and
+#' standard error of fold changes in three
 #' different levels of detrended logsignals.}
 #'
 #' @export
@@ -52,6 +53,10 @@ plotFC <- function(dat, positive, fcsign, constant = 0.5, loessspan=1/3,
                    thresholds = c(1, 6), ...){
     if(!is(dat, 'rnaseqcomp'))
         stop('"plotSD" only plots class "rnaseqcomp".')
+    para <- list(...)
+    if(length(para)!=0 && any(!(names(para) %in%
+             c("xlim","ylim","xlab","ylab","lty","lwd","main","col"))))
+        stop('... contains non-used arguments.')
     dat@quantData <- lapply(dat@quantData,function(x) x + constant)
     cdList <- list()
     for(i in 1:2){
@@ -67,7 +72,6 @@ plotFC <- function(dat, positive, fcsign, constant = 0.5, loessspan=1/3,
         x <- x[which(positive & !is.na(fcsign)), ]
         x
     })
-    para <- list(...)
     if(!('xlab' %in% names(para)))  xlab <- 'Detrended logSignal'
     else xlab <- para$xlab
     if(!('ylab' %in% names(para)))  ylab <- 'log2FoldChange'
@@ -110,11 +114,14 @@ plotFC <- function(dat, positive, fcsign, constant = 0.5, loessspan=1/3,
         idx1 <- x[,1] <= thresholds[1] & x[,1] > log2(constant+0.1)
         idx2 <- x[,1] < thresholds[2] & x[,1] > thresholds[1]
         idx3 <- x[,1] >= thresholds[2]
-        c(median(x[idx1, 2]), median(x[idx2, 2]), median(x[idx3, 2]))
+        c(median(x[idx1, 2]), median(x[idx2, 2]), median(x[idx3, 2]),
+          sd(x[idx1, 2]) / sqrt(length(idx1)),
+          sd(x[idx2, 2]) / sqrt(length(idx2)),
+          sd(x[idx3, 2]) / sqrt(length(idx3)))
     })
     colnames(FC) <- names(dat@quantData)
-    rownames(FC) <- c(paste0("A<=",thresholds[1]),
+    rownames(FC) <- rep(c(paste0("A<=",thresholds[1]),
                       paste0(thresholds[1],"<A<",thresholds[2]),
-                      paste0("A>=",thresholds[2]))
-    return(round(FC ,3))
+                      paste0("A>=",thresholds[2])),2)
+    return(list(med=round(FC[1:3,] ,2),se=round(FC[4:6,] ,3)))
 }
