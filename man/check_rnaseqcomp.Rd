@@ -2,7 +2,7 @@
 % Please edit documentation in R/AllClasses.R
 \name{check_rnaseqcomp}
 \alias{check_rnaseqcomp}
-\title{Sanity Check of S4 rnaseqcomp class}
+\title{Sanity Check of S4 rnaseqcomp Class}
 \usage{
 check_rnaseqcomp(object)
 }
@@ -11,5 +11,11 @@ check_rnaseqcomp(object)
 }
 \value{
 TRUE, or character if error happens.
+}
+\description{
+This function always checks if the elements are valid
+to create a S4 rnaseqcomp object. Specifically, check if \code{quantData}
+is a list of matrices, if \code{condInfo} has the correct length and
+levels, etc.
 }
 
