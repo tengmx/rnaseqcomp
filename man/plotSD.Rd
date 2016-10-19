@@ -30,7 +30,8 @@ cell lines. (default: 1)}
 \value{
 \item{plot}{SD plots of quantification pipelines for
 selected cell line by \code{plotcell}.}
-\item{SD}{One  matrix of median standard deviations.}
+\item{list}{A list of two matrices of median and standard error of
+standard deviations.}
 }
 \description{
 For each cell line in each pipeline,

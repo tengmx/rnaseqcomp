@@ -37,7 +37,8 @@ as the points to make threshold averaging on ROC curves.
 }
 \value{
 \item{plot}{Fold change plots for all the quantification pipelines.}
-\item{FC}{A numeric vector indicating median fold changes in three
+\item{list}{A list of two numeric vectors indicating median and
+standard error of fold changes in three
 different levels of detrended logsignals.}
 }
 \description{

@@ -59,6 +59,10 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
                     ...){
     if(!is(dat, 'rnaseqcomp'))
         stop('"plotSD" only plots class "rnaseqcomp".')
+    para <- list(...)
+    if(length(para)!=0 && any(!(names(para) %in%
+             c("xlim","ylim","xlab","ylab","lty","lwd","main","col"))))
+        stop('... contains non-used arguments.')
     dat@quantData <- lapply(dat@quantData, function(x) x + constant)
     cdList <- list()
     for(i in 1:2){
@@ -123,7 +127,6 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
             sdfprs[[i]][t] <- sd(fpr)
         }
     }
-    para <- list(...)
     if(!('xlab' %in% names(para)))  xlab <- 'FP'
     else xlab <- para$xlab
     if(!('ylab' %in% names(para)))  ylab <- 'TP'
@@ -147,11 +150,10 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
     }else col <- para$col
     lty <- rep_len(lty, length(dat@quantData))
     col <- rep_len(col, length(dat@quantData))
+    n <- max(ncol(cdList[[1]][[1]]), ncol(cdList[[2]][[1]]))
     for(i in seq_len(length(proplist))){
         x <- fprs[[i]]
         y <- tprs[[i]]
-        sey <- sdtprs[[i]] / sqrt(tprs[[i]])
-        sex <- sdfprs[[i]] / sqrt(fprs[[i]])
         if(i == 1) {
             plot(x, y, type = 'l', lwd = lwd, col = col[i],
                  lty = lty[i], xlim = xlim, ylim = ylim,
@@ -160,11 +162,14 @@ plotROC <- function(dat, positive, fcsign, cut = 1, constant = 0.5,
             lines(x,y, lwd = lwd, col = col[i], lty = lty[i])
         }
         if(arrow){
-            idx <- 2:(length(thresholds) - 1)
-            arrows(x[idx], (y-sey)[idx], x[idx], (y+sey)[idx],
-                   length = 0.02, angle = 90, code = 3)
-            arrows((x-sex)[idx], y[idx], (x+sex)[idx], y[idx],
-                   length = 0.02, angle = 90, code = 3)
+            sey <- sdtprs[[i]] / sqrt(n)
+            sex <- sdfprs[[i]] / sqrt(n)
+            idx1 <- sey != 0
+            arrows(x[idx1], (y-sey)[idx1], x[idx1], (y+sey)[idx1],
+                   length = 0.02, angle = 90, code = 3, col = col[i])
+            idx2 <- sex != 0
+            arrows((x-sex)[idx2], y[idx2], (x+sex)[idx2], y[idx2],
+                   length = 0.02, angle = 90, code = 3, col = col[i])
         }
     }
     abline(a = 0,b = 1,lty = 2)

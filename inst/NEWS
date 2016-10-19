@@ -10,3 +10,6 @@
     - functions changed with capability to be applied to large datasets
 * version 1.3.3
     - minor bugs fixed
+* version 1.3.4
+    - standard errors added
+
