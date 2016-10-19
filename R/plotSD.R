@@ -27,7 +27,8 @@
 #' @return
 #' \item{plot}{SD plots of quantification pipelines for
 #' selected cell line by \code{plotcell}.}
-#' \item{SD}{One  matrix of median standard deviations.}
+#' \item{list}{A list of two matrices of median and standard error of
+#' standard deviations.}
 #'
 #' @export
 #' @examples
@@ -47,6 +48,10 @@ plotSD <- function(dat, constant = 0.5, loessspan = 1/3,
                    ...){
     if(!is(dat, 'rnaseqcomp'))
         stop('"plotSD" only plots class "rnaseqcomp".')
+    para <- list(...)
+    if(length(para)!=0 && any(!(names(para) %in%
+             c("xlim","ylim","xlab","ylab","lty","lwd","main","col"))))
+        stop('... contains non-used arguments.')
     dat@quantData <- lapply(dat@quantData, function(x) x + constant)
     sdlist <- list()
     for(i in 1:2){
@@ -60,7 +65,6 @@ plotSD <- function(dat, constant = 0.5, loessspan = 1/3,
         })
 
     }
-    para <- list(...)
     if(!('xlab' %in% names(para)))  xlab <- 'Detrended logSignal'
     else xlab <- para$xlab
     if(!('ylab' %in% names(para)))  ylab <- 'SD'
@@ -130,12 +134,15 @@ plotSD <- function(dat, constant = 0.5, loessspan = 1/3,
                           x[,1] > thresholds[1]
                       idx3 <- x[,1] >= thresholds[2]
                       c(median(x[idx1, 2]), median(x[idx2, 2]),
-                        median(x[idx3, 2]))
+                        median(x[idx3, 2]),
+                        mad(x[idx1, 2]) / sqrt(length(idx1)),
+                        mad(x[idx2, 2]) / sqrt(length(idx2)),
+                        mad(x[idx3, 2]) / sqrt(length(idx3)))
                   }))
     SD <- sqrt((SDs[[1]]^2 + SDs[[2]]^2)/2)
     colnames(SD) <- names(dat@quantData)
-    rownames(SD) <- c(paste0("A<=", thresholds[1]),
+    rownames(SD) <- rep(c(paste0("A<=", thresholds[1]),
                       paste0(thresholds[1], "<A<", thresholds[2]),
-                      paste0("A>=", thresholds[2]))
-    return(round(SD, 3))
+                      paste0("A>=", thresholds[2])),2)
+    return(list(med=round(SD[1:3,], 2),se=round(SD[4:6,], 3)))
 }

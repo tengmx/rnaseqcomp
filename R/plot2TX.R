@@ -29,8 +29,9 @@
 #' @return
 #' \item{plot}{2TX plots of quantification pipelines for
 #' selected cell line by \code{plotcell}.}
-#' \item{2TX}{A matrix of mean proportion difference. Valuesa are based
-#' on averageing two cell lines.}
+#' \item{list}{A list of two matrices indicating the mean and standard error
+#' of absolute proportion differences. Valuesa are based
+#' on average of  two cell lines.}
 #'
 #' @export
 #' @examples
@@ -49,6 +50,10 @@ plot2TX <- function(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
                     ...){
     if(!is(dat,'rnaseqcomp'))
         stop('"plot2TX" only plots class "rnaseqcomp".')
+    para <- list(...)
+    if(length(para)!=0 && any(!(names(para) %in%
+             c("xlim","ylim","xlab","ylab","lty","lwd","main","col"))))
+        stop('... contains non-used arguments.')
     cdList <- list()
     for(i in 1:2){
         cdList[[i]] <- lapply(dat@quantData, function(x)
@@ -84,7 +89,6 @@ plot2TX <- function(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
             A[[i]][[k]] <- tmp2
         }
     }
-    para <- list(...)
     if(!('xlab' %in% names(para)))  xlab <- 'Detrended logSignal'
     else xlab <- para$xlab
     if(!('ylab' %in% names(para)))
@@ -160,19 +164,40 @@ plot2TX <- function(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
     TX2s <- list()
     for(k in 1:2){
         TX2s[[k]] <- sapply(seq_len(length(M)), function(i){
+            reps <- ncol(cdList[[k]][[1]])
+            if(reps>2){
+            combs <- reps*(reps-1)/2
+            As <- matrix(rowMeans(A[[i]][[k]]),ncol=combs)
+            Ms <- matrix(M[[i]][[k]],ncol=combs)
+            ms <- sapply(seq_len(combs),function(j){
+                idx1 <- As[,j] <= 2^thresholds[1] &
+                    As[,j] != 0
+                idx2 <- As[,j] < 2^thresholds[2] &
+                    As[,j] > 2^thresholds[1]
+                idx3 <- As[,j] >= 2^thresholds[2]
+                c(mean(abs(Ms[idx1,j])),mean(abs(Ms[idx2,j])),
+                  mean(abs(Ms[idx3,j])))
+            })
+            c(rowMeans(ms),apply(ms,1,sd)/sqrt(reps))
+        }else{
             idx1 <- rowMeans(A[[i]][[k]]) <= 2^thresholds[1] &
                 rowMeans(A[[i]][[k]]) != 0
             idx2 <- rowMeans(A[[i]][[k]]) < 2^thresholds[2] &
                 rowMeans(A[[i]][[k]]) > 2^thresholds[1]
             idx3 <- rowMeans(A[[i]][[k]]) >= 2^thresholds[2]
             c(mean(abs(M[[i]][[k]][idx1])), mean(abs(M[[i]][[k]][idx2])),
-              mean(abs(M[[i]][[k]][idx3])))
+              mean(abs(M[[i]][[k]][idx3])),
+              sd(abs(M[[i]][[k]][idx1])) / sqrt(length(idx1)),
+              sd(abs(M[[i]][[k]][idx2])) / sqrt(length(idx2)),
+              sd(abs(M[[i]][[k]][idx3])) / sqrt(length(idx3)))
+        }
         })
     }
-    TX2 <- (TX2s[[1]] + TX2s[[2]])/2
-    colnames(TX2) <- names(dat@quantData)
-    rownames(TX2) <- c(paste0("A<=", thresholds[1]),
+    TX2.mean <- (TX2s[[1]][1:3,] + TX2s[[2]][1:3,])/2
+    TX2.se <- sqrt((TX2s[[1]][4:6,]^2 + TX2s[[2]][4:6,]^2)/2)
+    colnames(TX2.mean) <- colnames(TX2.se) <- names(dat@quantData)
+    rownames(TX2.mean) <- rownames(TX2.se) <- c(paste0("A<=", thresholds[1]),
                        paste0(thresholds[1], "<A<", thresholds[2]),
                        paste0("A>=", thresholds[2]))
-    return(round(TX2, 3))
+    return(list(mean=round(TX2.mean, 2),se=round(TX2.se, 3)))
 }

@@ -48,6 +48,10 @@ plotNE <- function(dat,  steps = seq(-0.5, 12, 0.5), Ks = 0:3,
                    ...){
     if(!is(dat,'rnaseqcomp'))
         stop('"plotNE" only plots class "rnaseqcomp".')
+    para <- list(...)
+    if(length(para)!=0 && any(!(names(para) %in%
+             c("xlim","ylim","xlab","ylab","lty","lwd","main","col"))))
+        stop('... contains non-used arguments.')
     pnelist <- list()
     steps <- sort(unique(c(steps, Ks)))
     for(i in 1:2){
@@ -68,7 +72,6 @@ plotNE <- function(dat,  steps = seq(-0.5, 12, 0.5), Ks = 0:3,
             props/count
         })
     }
-    para <- list(...)
     if(!('xlab' %in% names(para)))  xlab <- '% of detrended logSignal below K'
     else xlab <- para$xlab
     if(!('ylab' %in% names(para)))

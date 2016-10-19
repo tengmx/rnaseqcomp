@@ -31,8 +31,9 @@ cell lines. (default: 1)}
 \value{
 \item{plot}{2TX plots of quantification pipelines for
 selected cell line by \code{plotcell}.}
-\item{2TX}{A matrix of mean proportion difference. Valuesa are based
-on averageing two cell lines.}
+\item{list}{A list of two matrices indicating the mean and standard error
+of absolute proportion differences. Valuesa are based
+on average of  two cell lines.}
 }
 \description{
 For any compared two replicates in each cell line,
