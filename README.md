@@ -1,4 +1,4 @@
-# rnaseqcomp: Benchmarks for RNA-seq quantification pipelines
+# rnaseqcomp: A benchmark for RNA-seq quantification pipelines
 
 ### Introduction
 RNA sequencing (RNA-seq) has been utilized as the standard technology for
