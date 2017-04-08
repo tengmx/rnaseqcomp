@@ -55,4 +55,3 @@ dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
 plot2TX(dat,genes=simdata$meta$gene)
 }
-

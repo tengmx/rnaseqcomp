@@ -107,14 +107,15 @@ signalCalibrate <- function(quantData, condInfo, repInfo, evaluationFeature,
     if(length(calibrationFeature) != nrow(quantData[[1]]))
         stop(paste0('The length of "calibrationFeature" must be the same as',
                     'the row number of "quantData" matrices.'))
-    if(length(calibrationFeature2) != nrow(quantData[[1]]))
+    if(!is.null(calibrationFeature2) &&
+       length(calibrationFeature2) != nrow(quantData[[1]]))
         stop(paste0('The length of "calibrationFeature2" must be the same as',
                     'the row number of "quantData" matrices.'))
     if(!is.logical(evaluationFeature))
         stop('"evaluationFeature" must be a logical vector.')
     if(!is.logical(calibrationFeature))
         stop('"calibrationFeature" must be a logical vector.')
-    if(!is.logical(calibrationFeature2))
+    if(!is.null(calibrationFeature2) && !is.logical(calibrationFeature2))
         stop('"calibrationFeature2" must be a logical vector.')
     if(!is.numeric(unitCutoff) || length(unitCutoff) > 1 ||
        unitCutoff < 0)

@@ -18,4 +18,3 @@ to create a S4 rnaseqcomp object. Specifically, check if \code{quantData}
 is a list of matrices, if \code{condInfo} has the correct length and
 levels, etc.
 }
-
