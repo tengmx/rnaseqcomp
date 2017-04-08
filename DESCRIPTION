@@ -1,5 +1,5 @@
 Package: rnaseqcomp
-Version: 1.5.1
+Version: 1.5.2
 Title: Benchmarks for RNA-seq Quantification Pipelines
 Description: Several quantitative and visualized benchmarks
     for RNA-seq quantification pipelines. Two-condition
@@ -22,4 +22,4 @@ Suggests:
 URL: https://github.com/tengmx/rnaseqcomp
 License: GPL-3
 biocViews: RNASeq, Visualization, QualityControl
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

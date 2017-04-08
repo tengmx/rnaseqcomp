@@ -61,4 +61,3 @@ calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
 simdata$meta$fcsign[simdata$meta$fcstatus == "off.on"] <- NA
 plotFC(dat,simdata$meta$positive,simdata$meta$fcsign)
 }
-

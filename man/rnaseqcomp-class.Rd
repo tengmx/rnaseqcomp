@@ -18,4 +18,3 @@ median log2 signal of calibration references. \code{scaler} is a number
 that point to the median log2 signal of reference pipeline. \code{refMed}
 and \code{scaler} were used to calibrate and generate \code{quantData}.
 }
-

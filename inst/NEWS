@@ -14,3 +14,5 @@
     - standard errors added
 * version 1.5.0
     - GitHub and SVN merged
+* version 1.5.2
+    - bug in calibrationFeature2 fixed
