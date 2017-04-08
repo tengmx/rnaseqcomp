@@ -54,4 +54,3 @@ dat <- signalCalibrate(simdata$quant, condInfo, repInfo, evaluationFeature,
 calibrationFeature, unitReference, calibrationFeature2 = calibrationFeature)
 plotNE(dat)
 }
-

@@ -17,4 +17,3 @@ is included at \code{simdata$meta}, inlcuding if they belongs
 to house keeping genes and their true fold change status.
 Sample information is included at \code{simdata$samp}.
 }
-
