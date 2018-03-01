@@ -20,7 +20,9 @@ install:
   - R --slave -e "source('https://bioconductor.org/biocLite.R')"
 script:
   - R --slave -e "devtools::install_local(getwd())"
-  - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2')); if (dir.exists('tests/testthat')) devtools::test()"
+  - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2'))" 
+  - R --slave -e "if (dir.exists('tests/testthat')) devtools::test()"
+  - R --slave -e "devtools::document(roclets=c('rd', 'collate', 'namespace', 'vignette'))"
 
 notifications:
   email: false
