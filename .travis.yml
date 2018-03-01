@@ -17,7 +17,6 @@ before_install:
   - R -e "if (Sys.getenv('TRAVIS_EVENT_TYPE') == 'cron') unlink(dir(.libPaths()[1], full.names = T), recursive = T)"
 install:
   - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')"
-  - R --slave -e "devtools::install_github('r-lib/devtools')"
   - R --slave -e "source('https://bioconductor.org/biocLite.R')"
 script:
   - R --slave -e "devtools::install_local(getwd())"
