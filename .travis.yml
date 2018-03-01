@@ -1,0 +1,27 @@
+language: r
+os: [linux, osx]
+r: [release, devel, oldrel]
+matrix:
+  fast_finish: true
+  allow_failures:
+  - r: devel
+  - r: oldrel
+cache: packages
+latex: false
+pandoc: false
+fortran: false
+git:
+  depth: false
+
+before_install:
+  - R -e "if (Sys.getenv('TRAVIS_EVENT_TYPE') == 'cron') unlink(dir(.libPaths()[1], full.names = T), recursive = T)"
+install:
+  - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')"
+  - R --slave -e "devtools::install_github('r-lib/devtools')"
+  - R --slave -e "source('https://bioconductor.org/biocLite.R')"
+script:
+  - R --slave -e "devtools::install_local(getwd())"
+  - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2')); if (dir.exists('tests/testthat')) devtools::test()"
+
+notifications:
+  email: false
