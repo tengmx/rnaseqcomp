@@ -15,14 +15,13 @@ git:
 
 before_install:
   - R -e "if (Sys.getenv('TRAVIS_EVENT_TYPE') == 'cron') unlink(dir(.libPaths()[1], full.names = T), recursive = T)"
-install:
   - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')"
-  - R --slave -e "source('https://bioconductor.org/biocLite.R')"
+install:
+  - R -e 'devtools::install_deps(dep = T)'
 script:
-  - R --slave -e "devtools::install_local(getwd())"
-  - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2'))" 
-  - R --slave -e "if (dir.exists('tests/testthat')) devtools::test()"
-  - R --slave -e "devtools::document(roclets=c('rd', 'collate', 'namespace', 'vignette'))"
+  - R CMD build .
+atfer_success:
+  - R CMD check *tar.gz
 
 notifications:
   email: false
