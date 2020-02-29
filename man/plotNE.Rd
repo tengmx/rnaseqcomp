@@ -4,8 +4,8 @@
 \alias{plotNE}
 \title{Estimate And Plot Express And Non-express Features}
 \usage{
-plotNE(dat, steps = seq(-0.5, 12, 0.5), Ks = 0:3, pchK = seq_along(Ks) -
-  1, plotcell = 1, ...)
+plotNE(dat, steps = seq(-0.5, 12, 0.5), Ks = 0:3,
+  pchK = seq_along(Ks) - 1, plotcell = 1, ...)
 }
 \arguments{
 \item{dat}{A \code{rnaseqcomp} S4 class object.}

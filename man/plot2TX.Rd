@@ -4,7 +4,8 @@
 \alias{plot2TX}
 \title{Estimate And Plot Transcript Proportion Difference}
 \usage{
-plot2TX(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1, ...)
+plot2TX(dat, genes, step = 0.5, thresholds = c(1, 6), plotcell = 1,
+  ...)
 }
 \arguments{
 \item{dat}{A \code{rnaseqcomp} S4 class object.}

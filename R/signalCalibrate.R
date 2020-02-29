@@ -83,8 +83,8 @@ signalCalibrate <- function(quantData, condInfo, repInfo, evaluationFeature,
                          calibrationFeature, unitReference, unitCutoff = 0,
                          calibrationFeature2 = NULL, fixMedian = 4.776){
     if(!is.list(quantData) ||
-       length(unique(sapply(quantData,class)))>1 ||
-       unique(sapply(quantData,class)) != "matrix" ||
+       length(unique(sapply(quantData,is.matrix)))>1 ||
+       !unique(sapply(quantData,is.matrix))  ||
        sum(sapply(quantData,dim) - dim(quantData[[1]]) != 0) > 0)
         stop('"quantData" is not a list of same size matrices.')
     if(sum(sapply(quantData, function(x) sum(x<0, na.rm = TRUE))) > 0)
