@@ -7,7 +7,7 @@ author: |
   | Harvard T.H. Chan School Public Health, Boston, MA, USA
 date: "`r Sys.Date()`"
 output:
-  BiocStyle::pdf_document:
+  BiocStyle::html_document:
     toc: true
 bibliography: rnaseqcomp.bib
 graphics: yes
