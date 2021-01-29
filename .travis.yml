@@ -1,0 +1,27 @@
+language: r
+os: [linux, osx]
+r: [release, devel, oldrel]
+matrix:
+  fast_finish: true
+  allow_failures:
+  - r: devel
+  - r: oldrel
+cache: packages
+latex: false
+pandoc: false
+fortran: false
+git:
+  depth: false
+
+before_install:
+  - R -e "if (Sys.getenv('TRAVIS_EVENT_TYPE') == 'cron') unlink(dir(.libPaths()[1], full.names = T), recursive = T)"
+  - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')"
+install:
+  - R -e 'devtools::install_deps(dep = T)'
+script:
+  - R CMD build .
+atfer_success:
+  - R CMD check *tar.gz
+
+notifications:
+  email: false
